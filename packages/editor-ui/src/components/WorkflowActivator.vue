@@ -30,19 +30,12 @@ import { genericHelpers } from '@/components/mixins/genericHelpers';
 import { restApi } from '@/components/mixins/restApi';
 import { showMessage } from '@/components/mixins/showMessage';
 import { workflowHelpers } from '@/components/mixins/workflowHelpers';
-import {
-	IWorkflowDataUpdate,
-	INodeUi,
-	IWorkflowDb,
-} from '../Interface';
+import { IWorkflowDataUpdate } from '../Interface';
 
 import mixins from 'vue-typed-mixins';
 import { mapGetters } from "vuex";
+
 import {
-	INodeTypeDescription,
-} from 'n8n-workflow';
-import {
-	EXECUTIONS_MODAL_KEY,
 	WORKFLOW_ACTIVE_MODAL_KEY,
 	LOCAL_STORAGE_ACTIVATION_FLAG,
 } from '@/constants';
@@ -65,7 +58,6 @@ export default mixins(
 			data () {
 				return {
 					loading: false,
-					nodes: [] as INodeUi[],
 				};
 			},
 			computed: {
@@ -96,7 +88,7 @@ export default mixins(
 					return false;
 				},
 				isCurrentWorkflow() {
-					return this.workflowId && this.$store.state.workflow.id == this.workflowId;
+					return this.workflowId && this.$store.state.workflow.id === this.workflowId;
 				},
 				containsTrigger(): boolean {
 					const foundTriggers = this.$store.getters.worklfowEnabledTriggerNodes;
