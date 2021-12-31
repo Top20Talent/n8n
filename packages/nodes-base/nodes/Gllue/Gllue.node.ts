@@ -6,6 +6,7 @@ import {getResponseByUri, UrlParams} from './helpers';
 import {cityFields, cityOperations} from './CityDescription';
 import {industryFields, industryOperations} from './IndustryDescription';
 import {contractFields, contractOperations} from './ContractDescription';
+import {userFields, userOperations} from './UserDescriptions';
 
 const helpers = require('./helpers');
 
@@ -50,6 +51,10 @@ export class Gllue implements INodeType {
 						value: 'industry',
 					},
 					{
+						name: 'User',
+						value: 'user',
+					},
+					{
 						name: 'Contract',
 						value: 'clientcontract',
 					},
@@ -66,6 +71,8 @@ export class Gllue implements INodeType {
 			...industryFields,
 			...contractOperations,
 			...contractFields,
+			...userOperations,
+			...userFields,
 		],
 	};
 
@@ -90,16 +97,20 @@ export class Gllue implements INodeType {
 			if (operation === 'simple_list_with_ids') {
 				responseData = await getResponseByUri(uriGenerated, this.helpers.request);
 			}
-		} else if (resource === 'industry') {
-			if (operation === 'simple_list_with_ids'){
+		} else if (resource === 'user') {
+			if (operation === 'simple_list_with_ids') {
 				responseData = await getResponseByUri(uriGenerated, this.helpers.request);
 			}
-		} else if (resource === 'clientcontract'){
-			if (operation === 'delete'){
+		} else if (resource === 'industry') {
+			if (operation === 'simple_list_with_ids') {
+				responseData = await getResponseByUri(uriGenerated, this.helpers.request);
+			}
+		} else if (resource === 'clientcontract') {
+			if (operation === 'delete') {
 				const contractIds = this.getInputData().map(
 					(item, index) => this.getNodeParameter('id', index),
 				);
-				const body = { ids: contractIds, count: contractIds.length };
+				const body = {ids: contractIds, count: contractIds.length};
 				responseData = await getResponseByUri(uriGenerated, this.helpers.request, 'POST', body);
 			}
 		}
