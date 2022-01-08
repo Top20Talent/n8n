@@ -28,7 +28,7 @@ export const userOperations: INodeProperties[] = [
 
 export const userFields: INodeProperties[] = [
 	/* -------------------------------------------------------------------------- */
-	/*                                 user:simple list with ids                             */
+	/*                                 user:simple list with ids                  */
 	/* -------------------------------------------------------------------------- */
 	{
 		displayName: 'Filters',
