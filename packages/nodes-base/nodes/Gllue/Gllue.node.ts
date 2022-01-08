@@ -7,6 +7,7 @@ import {cityFields, cityOperations} from './CityDescription';
 import {industryFields, industryOperations} from './IndustryDescription';
 import {contractFields, contractOperations} from './ContractDescription';
 import {userFields, userOperations} from './UserDescriptions';
+import {DEFAULT_PAGE, DEFAULT_PAGINATE_BY} from './constants';
 
 const helpers = require('./helpers');
 
@@ -82,8 +83,8 @@ export class Gllue implements INodeType {
 		const operation = this.getNodeParameter('operation', 0) as string;
 		// tslint:disable-next-line:no-any
 		const filters = this.getNodeParameter('filters', 0, {fields: 'id'}) as any;
-		const paginateBy = this.getNodeParameter('paginateBy', 0, ) as number;
-		const page = this.getNodeParameter('page', 0, ) as number;
+		const paginateBy = this.getNodeParameter('paginateBy', 0, DEFAULT_PAGINATE_BY) as number;
+		const page = this.getNodeParameter('page', 0, DEFAULT_PAGE) as number;
 		const credentials = await this.getCredentials('gllueApi') as IDataObject;
 
 		const timestamp = helpers.getCurrentTimeStamp();
