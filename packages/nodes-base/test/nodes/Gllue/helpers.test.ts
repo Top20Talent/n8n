@@ -82,7 +82,7 @@ describe('Gllue url parameters builder', () => {
 			`${BASE_URL}?gql=&${DEFAULT_PARAMS}`);
 	});
 	it('should build with fields', () => {
-		const urlParams = new UrlParams('', FIELDS, TOKEN, PAGINATION, ORDERING, PAGE );
+		const urlParams = new UrlParams('', FIELDS, TOKEN, PAGINATION, PAGE, ORDERING );
 		const url = helpers.gllueUrlBuilder(HOST, RESOURCE, OPTION, urlParams);
 		expect(url).toEqual(
 			`${BASE_URL}?gql=&fields=id,name&paginate_by=10&ordering=id&page=2&private_token=${TOKEN}`);
