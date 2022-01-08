@@ -82,11 +82,13 @@ export class Gllue implements INodeType {
 		const operation = this.getNodeParameter('operation', 0) as string;
 		// tslint:disable-next-line:no-any
 		const filters = this.getNodeParameter('filters', 0, {fields: 'id'}) as any;
+		const paginateBy = this.getNodeParameter('paginateBy', 0, ) as number;
+		const page = this.getNodeParameter('page', 0, ) as number;
 		const credentials = await this.getCredentials('gllueApi') as IDataObject;
 
 		const timestamp = helpers.getCurrentTimeStamp();
 		const token = helpers.generateTokenWithAESKey(timestamp, credentials.apiUsername, credentials.apiAesKey);
-		const urlParams = new UrlParams(filters.query, filters.fields, token);
+		const urlParams = new UrlParams(filters.query, filters.fields, token, paginateBy,page);
 		const uriGenerated = helpers.gllueUrlBuilder(credentials.apiHost, resource, operation, urlParams);
 
 		if (resource === 'client') {
