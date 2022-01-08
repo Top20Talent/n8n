@@ -31,6 +31,27 @@ export const clientFields: INodeProperties[] = [
 	/*                                 client:getAll                             */
 	/* -------------------------------------------------------------------------- */
 	{
+		displayName: 'Rows per Page',
+		name: 'paginateBy',
+		type: 'number',
+		displayOptions: {
+			show: {
+				resource: [
+					'client',
+				],
+				operation: [
+					'simple_list_with_ids',
+				],
+			},
+		},
+		typeOptions: {
+			minValue: 1,
+			maxValue: 25,
+		},
+		default: 10,
+		description: 'How many results to return in one page',
+	},
+	{
 		displayName: 'Filters',
 		name: 'filters',
 		type: 'collection',
