@@ -261,13 +261,6 @@ export const mailFields: INodeProperties[] = [
 		},
 		options: [
 			{
-				displayName: 'Track Source',
-				name: 'trackSource',
-				type: 'string',
-				default: 'n8n',
-				description: 'source for webhook to identify',
-			},
-			{
 				displayName: 'Track ID',
 				name: 'trackId',
 				type: 'string',
