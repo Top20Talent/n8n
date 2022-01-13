@@ -108,6 +108,7 @@
       "dist/credentials/GitlabOAuth2Api.credentials.js",
       "dist/credentials/GitPassword.credentials.js",
       "dist/credentials/GllueApi.credentials.js",
+      "dist/credentials/GllueTriggerApi.credentials.js",
       "dist/credentials/GmailOAuth2Api.credentials.js",
       "dist/credentials/GoogleAnalyticsOAuth2Api.credentials.js",
       "dist/credentials/GoogleApi.credentials.js",

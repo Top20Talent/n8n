@@ -36,7 +36,12 @@ export class GllueTrigger implements INodeType {
 		},
 		inputs: [],
 		outputs: ['main'],
-		credentials: [],
+		credentials: [
+			{
+				name: 'gllueTriggerApi',
+				required: true,
+			},
+		],
 		webhooks: [
 			{
 				name: 'default',
@@ -45,7 +50,24 @@ export class GllueTrigger implements INodeType {
 				path: 'webhook',
 			},
 		],
-		properties: [],
+		properties: [{
+			displayName: 'Event',
+			name: 'event',
+			type: 'options',
+			required: true,
+			default: '',
+			options: [
+				{
+					name: 'CV Sent',
+					value: 'cvsent',
+				},
+				{
+					name: 'Interview',
+					value: 'clientinterview',
+				},
+			],
+		},
+		],
 	};
 
 	async webhook(this: IWebhookFunctions): Promise<IWebhookResponseData> {
