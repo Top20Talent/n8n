@@ -10,6 +10,7 @@ import {
 	IWebhookResponseData,
 } from 'n8n-workflow';
 import {Response} from 'express';
+import {convertEventPayload} from "./helpers";
 
 /*
 import {
@@ -104,8 +105,9 @@ export class GllueTrigger implements INodeType {
 			// Provided authentication data is wrong
 			return authorizationError(resp, realm, 403);
 		}
+		const item = convertEventPayload(req.body);
 		return {
-			workflowData: [this.helpers.returnJsonArray(req.body)],
+			workflowData: [this.helpers.returnJsonArray(item)],
 		};
 	}
 }
