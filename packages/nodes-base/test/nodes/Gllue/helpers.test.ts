@@ -106,8 +106,17 @@ describe('gllue event convert', () => {
 			sign: '407ee388772e372d3a118af4037c1453',
 		};
 		const outItem = convertEventPayload(item);
-		expect(outItem.info.trigger_model_name).toEqual('clientinterview');
-		expect(outItem.info.trigger_model_id).toEqual(30817);
-		expect(outItem.info.trigger_time).toEqual('2022-01-12 08:33:48');
+		expect(outItem).toEqual({
+			'date': '2022-01-12 08:33:48',
+			'info': {
+				'trigger_field': null,
+				'trigger_mode': 'CREATE',
+				'trigger_model_id': 30817,
+				'trigger_model_name': 'clientinterview',
+				'trigger_time': '2022-01-12 08:33:48',
+			},
+			'sign': '407ee388772e372d3a118af4037c1453',
+		});
+
 	});
 });

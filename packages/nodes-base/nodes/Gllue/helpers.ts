@@ -1,6 +1,6 @@
 import {OptionsWithUri} from 'request';
 import {IDataObject} from 'n8n-workflow';
-import {GllueEvent, N8nGllueEvent} from './interfaces';
+import {GllueEvent} from './interfaces';
 
 const crypto = require('crypto');
 
@@ -112,7 +112,7 @@ export async function getResponseByUri(uriGenerated: string, requestMethod: any,
 	return await requestMethod(options);
 }
 
-export function convertEventPayload(item: GllueEvent):N8nGllueEvent{
+export function convertEventPayload(item: GllueEvent):IDataObject{
 	const info = JSON.parse(item.info);
 	return {
 		date: item.date,
