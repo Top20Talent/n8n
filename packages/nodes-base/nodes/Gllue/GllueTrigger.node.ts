@@ -9,6 +9,7 @@ import {
 	INodeTypeDescription,
 	IWebhookResponseData,
 } from 'n8n-workflow';
+import {Response} from 'express';
 
 /*
 import {
@@ -19,6 +20,23 @@ import {
 	snakeCase,
 } from 'change-case';
 */
+
+function authorizationError(resp: Response, realm: string, responseCode: number, message?: string) {
+	if (message === undefined) {
+		message = 'Authorization problem!';
+		if (responseCode === 401) {
+			message = 'Authorization is required!';
+		} else if (responseCode === 403) {
+			message = 'Authorization data is wrong!';
+		}
+	}
+
+	resp.writeHead(responseCode, {'WWW-Authenticate': `Basic realm="${realm}"`});
+	resp.end(message);
+	return {
+		noWebhookResponse: true,
+	};
+}
 
 
 export class GllueTrigger implements INodeType {
@@ -71,8 +89,23 @@ export class GllueTrigger implements INodeType {
 	};
 
 	async webhook(this: IWebhookFunctions): Promise<IWebhookResponseData> {
+		const credentials = await this.getCredentials('gllueTriggerApi') as IDataObject;
+		const expectedToken = credentials.apiToken as string;
+		const req = this.getRequestObject();
+		const token = req.query.token as string;
+		const resp = this.getResponseObject();
+		const realm = 'Webhook';
+
+		if (token === undefined) {
+			// Authorization data is missing
+			return authorizationError(resp, realm, 401);
+		}
+		if (token !== expectedToken) {
+			// Provided authentication data is wrong
+			return authorizationError(resp, realm, 403);
+		}
 		return {
-			workflowData: [],
+			workflowData: [this.helpers.returnJsonArray(req.body)],
 		};
 	}
 }
