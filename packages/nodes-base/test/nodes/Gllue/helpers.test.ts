@@ -1,14 +1,8 @@
-import {UrlParams} from '../../../nodes/Gllue/helpers';
+import {convertEventPayload, UrlParams} from '../../../nodes/Gllue/helpers';
+import {GllueEvent} from '../../../nodes/Gllue/interfaces';
 
 
 const helpers = require('../../../nodes/Gllue/helpers');
-
-beforeAll(() => {
-	jest
-		.useFakeTimers('modern')
-		.setSystemTime(new Date('2021-02-18 12:24:00'));
-
-});
 
 const TIMESTAMP = '1613622240000';
 const EMAIL = 'flash@cgptalent.com';
@@ -18,10 +12,6 @@ const AES_KEY = 'eqs214hvIHEY7Reg';
 const TOKEN = 'U5yBIIC7ieV934VhmvAeevpNSejoGUbbMHEJXXPSElN91gVC1aiONXWNC%2Frnc1Xn8H0NFdFar%2BNOB%2FkMkv1ZLw%3D%3D';
 
 describe('Private Token Generator', () => {
-	it('should get current date string', () => {
-		const realData = helpers.getCurrentTimeStamp();
-		expect(realData).toStrictEqual(TIMESTAMP);
-	});
 	it('should connect the data with comma', () => {
 		const realData = helpers.connectWithComma(TIMESTAMP, EMAIL);
 		expect(realData).toStrictEqual(`${TIMESTAMP},${EMAIL},`);
@@ -78,11 +68,10 @@ describe('Gllue url parameters builder', () => {
 		const urlParams = new UrlParams('', 'id', TOKEN);
 		const url = helpers.gllueUrlBuilder(HOST, RESOURCE, OPTION, urlParams);
 		expect(url).toEqual(
-
 			`${BASE_URL}?gql=&${DEFAULT_PARAMS}`);
 	});
 	it('should build with fields', () => {
-		const urlParams = new UrlParams('', FIELDS, TOKEN, PAGINATION, PAGE, ORDERING );
+		const urlParams = new UrlParams('', FIELDS, TOKEN, PAGINATION, PAGE, ORDERING);
 		const url = helpers.gllueUrlBuilder(HOST, RESOURCE, OPTION, urlParams);
 		expect(url).toEqual(
 			`${BASE_URL}?gql=&fields=id,name&paginate_by=10&ordering=id&page=2&private_token=${TOKEN}`);
@@ -100,10 +89,25 @@ describe('Gllue url parameters builder', () => {
 			`${BASE_URL}?gql=type__s%3Dprospect%252Cclient%26keyword__eq%3Dright` +
 			`&${DEFAULT_PARAMS}`);
 	});
-		it('should build with token', () => {
+	it('should build with token', () => {
 		const urlParams = new UrlParams('', 'id', TOKEN);
 		const url = helpers.gllueUrlBuilder(HOST, RESOURCE, OPTION, urlParams);
 		expect(url).toEqual(
 			`${BASE_URL}?gql=&${DEFAULT_PARAMS}`);
+	});
+});
+
+describe('gllue event convert', () => {
+	it('should parse data', () => {
+		const item: GllueEvent = {
+			date: '2022-01-12 08:33:48',
+			info: '{"trigger_model_name":"clientinterview","trigger_model_id":30817,"trigger_mode":"CREATE",' +
+				'"trigger_field":null,"trigger_time":"2022-01-12 08:33:48"}',
+			sign: '407ee388772e372d3a118af4037c1453',
+		};
+		const outItem = convertEventPayload(item);
+		expect(outItem.info.trigger_model_name).toEqual('clientinterview');
+		expect(outItem.info.trigger_model_id).toEqual(30817);
+		expect(outItem.info.trigger_time).toEqual('2022-01-12 08:33:48');
 	});
 });
