@@ -10,6 +10,7 @@ export class ErrorMessageBuilder {
 	realm: string;
 	resp: Response;
 
+	// TODO: remove any and refactor in Unit Test
 	// tslint:disable-next-line:no-any
 	constructor(resp: Response | any, realm: string, responseCode: number) {
 		this.resp = resp;
@@ -19,8 +20,8 @@ export class ErrorMessageBuilder {
 
 	static getMessage(responseCode?: number): string {
 		let message = 'Authorization problem!';
-		if (responseCode === 401) {
-			message = 'Authorization is required!';
+		if (responseCode === 401) { // TODO: magic number
+			message = 'Authorization is required!'; // TODO: magic string
 		} else if (responseCode === 403) {
 			message = 'Authorization data is wrong!';
 		}else if (responseCode === 202){
