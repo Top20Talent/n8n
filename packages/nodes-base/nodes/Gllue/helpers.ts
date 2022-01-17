@@ -106,7 +106,7 @@ function buildOptionWithUri(uriGenerated: string, method = 'GET', body: IDataObj
 }
 
 // tslint:disable-next-line:no-any
-export async function getResponseByUri(uriGenerated: string, requestMethod: any, method: string = 'GET', body: IDataObject = {}) {
+export async function getResponseByUri(uriGenerated: string, requestMethod: any, method = 'GET', body: IDataObject = {}) {
 	const options = buildOptionWithUri(uriGenerated, method, body);
 	console.log(`request with ${options.uri}`);
 	return await requestMethod(options);

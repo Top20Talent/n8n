@@ -1,16 +1,8 @@
-import {
-	IHookFunctions,
-	IWebhookFunctions,
-} from 'n8n-core';
+import {IWebhookFunctions,} from 'n8n-core';
 
-import {
-	IDataObject,
-	INodeType,
-	INodeTypeDescription,
-	IWebhookResponseData,
-} from 'n8n-workflow';
-import {Response} from 'express';
-import {convertEventPayload} from "./helpers";
+import {IDataObject, INodeType, INodeTypeDescription, IWebhookResponseData,} from 'n8n-workflow';
+import {convertEventPayload} from './helpers';
+import {ErrorMessageBuilder, TokenValidator} from './GenericFunctions';
 
 /*
 import {
@@ -21,23 +13,6 @@ import {
 	snakeCase,
 } from 'change-case';
 */
-
-function authorizationError(resp: Response, realm: string, responseCode: number, message?: string) {
-	if (message === undefined) {
-		message = 'Authorization problem!';
-		if (responseCode === 401) {
-			message = 'Authorization is required!';
-		} else if (responseCode === 403) {
-			message = 'Authorization data is wrong!';
-		}
-	}
-
-	resp.writeHead(responseCode, {'WWW-Authenticate': `Basic realm="${realm}"`});
-	resp.end(message);
-	return {
-		noWebhookResponse: true,
-	};
-}
 
 
 export class GllueTrigger implements INodeType {
@@ -97,14 +72,16 @@ export class GllueTrigger implements INodeType {
 		const resp = this.getResponseObject();
 		const realm = 'Webhook';
 
-		if (token === undefined) {
-			// Authorization data is missing
-			return authorizationError(resp, realm, 401);
+		const validator = new TokenValidator(token, expectedToken);
+		if (validator.isMissing()) {
+			const builder = new ErrorMessageBuilder(resp, realm, 401);
+			return builder.handle();
 		}
-		if (token !== expectedToken) {
-			// Provided authentication data is wrong
-			return authorizationError(resp, realm, 403);
+		if (validator.isWrong()) {
+			const builder = new ErrorMessageBuilder(resp, realm, 403);
+			return builder.handle();
 		}
+
 		const item = convertEventPayload(req.body);
 		return {
 			workflowData: [this.helpers.returnJsonArray(item)],

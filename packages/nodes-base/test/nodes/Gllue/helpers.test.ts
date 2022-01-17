@@ -1,4 +1,4 @@
-import {convertEventPayload, UrlParams} from '../../../nodes/Gllue/helpers';
+import {convertEventPayload, getCurrentTimeStamp, UrlParams} from '../../../nodes/Gllue/helpers';
 import {GllueEvent} from '../../../nodes/Gllue/interfaces';
 
 
