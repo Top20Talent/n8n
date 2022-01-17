@@ -23,6 +23,8 @@ export class ErrorMessageBuilder {
 			message = 'Authorization is required!';
 		} else if (responseCode === 403) {
 			message = 'Authorization data is wrong!';
+		}else if (responseCode === 202){
+			message = 'Skipped, event is not the same with webhook.';
 		}
 		return message;
 	}
@@ -57,5 +59,11 @@ export class TokenValidator {
 
 	isWrong() {
 		return this.token !== this.expectedToken;
+	}
+}
+
+export class EventChecker {
+	static isValid(payloadEvent:string, nodeEvent:string){
+		return payloadEvent === nodeEvent;
 	}
 }

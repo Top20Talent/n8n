@@ -2,7 +2,7 @@ import {IWebhookFunctions,} from 'n8n-core';
 
 import {IDataObject, INodeType, INodeTypeDescription, IWebhookResponseData,} from 'n8n-workflow';
 import {convertEventPayload} from './helpers';
-import {ErrorMessageBuilder, TokenValidator} from './GenericFunctions';
+import {ErrorMessageBuilder, EventChecker, TokenValidator} from './GenericFunctions';
 
 export class GllueTrigger implements INodeType {
 	description: INodeTypeDescription = {
@@ -72,8 +72,13 @@ export class GllueTrigger implements INodeType {
 		}
 
 		const item = convertEventPayload(req.body);
-		return {
-			workflowData: [this.helpers.returnJsonArray(item)],
-		};
+		const event = this.getNodeParameter('event') as string;
+		// @ts-ignore
+		if (EventChecker.isValid(item.info.trigger_model_name, event)) {
+			return {workflowData: [this.helpers.returnJsonArray(item)],};
+		} else {
+			const builder = new ErrorMessageBuilder(resp, realm, 202);
+			return builder.handle();
+		}
 	}
 }

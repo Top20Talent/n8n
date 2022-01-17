@@ -1,4 +1,5 @@
-import {ErrorMessageBuilder, TokenValidator} from '../../../nodes/Gllue/GenericFunctions';
+import {ErrorMessageBuilder, EventChecker, TokenValidator} from '../../../nodes/Gllue/GenericFunctions';
+import {CV_SENT_EVENT, INTERVIEW_EVENT} from '../../../nodes/Gllue/constants';
 
 describe('error message builder', () => {
 	it('should return on undefined', () => {
@@ -12,6 +13,10 @@ describe('error message builder', () => {
 	it('should return on 403', () => {
 		const message = ErrorMessageBuilder.getMessage(403);
 		expect(message).toEqual('Authorization data is wrong!');
+	});
+	it('should return on 202', () => {
+		const message = ErrorMessageBuilder.getMessage(202);
+		expect(message).toEqual('Skipped, event is not the same with webhook.');
 	});
 	it('should build headers with realm', () => {
 		const header = ErrorMessageBuilder.getHeader('webhook');
@@ -44,5 +49,14 @@ describe('token validator', ()=>{
 	it('should wrong on different token', ()=>{
 		const validator = new TokenValidator('token', 'expected-token');
 		expect(validator.isWrong()).toBeTruthy();
+	});
+});
+
+describe('event check', ()=>{
+	it('should be true on same event', ()=>{
+		expect(EventChecker.isValid('cvsent', CV_SENT_EVENT)).toBeTruthy();
+	});
+	it('should be false on different event', ()=>{
+		expect(EventChecker.isValid('cvsent', INTERVIEW_EVENT)).toBeFalsy();
 	});
 });
