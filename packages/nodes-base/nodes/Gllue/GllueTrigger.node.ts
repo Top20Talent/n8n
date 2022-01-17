@@ -4,17 +4,6 @@ import {IDataObject, INodeType, INodeTypeDescription, IWebhookResponseData,} fro
 import {convertEventPayload} from './helpers';
 import {ErrorMessageBuilder, TokenValidator} from './GenericFunctions';
 
-/*
-import {
-	autofriendApiRequest,
-} from './GenericFunctions';
-
-import {
-	snakeCase,
-} from 'change-case';
-*/
-
-
 export class GllueTrigger implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Gllue Trigger',
