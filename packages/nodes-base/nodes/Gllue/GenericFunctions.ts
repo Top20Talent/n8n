@@ -104,19 +104,57 @@ export class Gllue {
 
 export class Hasura {
 	apiHost = 'http://localhost:8083/api/rest';
+	resource = '';
+	action = '';
 	request: N8nRequest;
 
 	constructor(request: N8nRequest) {
 		this.request = request;
 	}
 
-}
+	getUrl() {
+		return `${this.apiHost}/${this.resource}/${this.action}`;
+	}
 
-export class ConsentAPI extends Hasura {
-	async getConsentedByCandidateId(candidateId: number) {
-		const uri = `${this.apiHost}/consent/is-consented`;
-		const payload = {candidate_id: candidateId};
+	getPayload() {
+		return {};
+	}
+
+	async post() {
+		const uri = this.getUrl();
+		const payload = this.getPayload();
 		const options = buildOptionWithUri(uri, 'POST', payload);
 		return await this.request(options);
+
+	}
+}
+
+class ConsentAPI extends Hasura {
+	resource = 'consent';
+	candidateId: number;
+	dateBefore: string | undefined;
+
+	constructor(request: N8nRequest, candidateId: number, dateBefore?: string) {
+		super(request);
+		this.candidateId = candidateId;
+		this.dateBefore = dateBefore;
+	}
+
+}
+export class ConsentedConsentAPIEndpint extends ConsentAPI {
+	action = 'is-consented';
+
+	getPayload() {
+		const payload = super.getPayload();
+		return Object.assign(payload, {candidate_id: this.candidateId});
+	}
+}
+
+export class SentConsentAPIEndpoint extends ConsentAPI {
+	action = 'is-sent-30-days';
+
+	getPayload() {
+		const payload = super.getPayload();
+		return Object.assign(payload, {candidate_id: this.candidateId, date_before_30_days: this.dateBefore});
 	}
 }

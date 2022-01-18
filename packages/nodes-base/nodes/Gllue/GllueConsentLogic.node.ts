@@ -1,7 +1,7 @@
 import {IExecuteFunctions,} from 'n8n-core';
 
 import {IDataObject, INodeExecutionData, INodeType, INodeTypeDescription,} from 'n8n-workflow';
-import {ConsentAPI, Gllue} from './GenericFunctions';
+import { ConsentedConsentAPIEndpint, Gllue, SentConsentAPIEndpoint} from './GenericFunctions';
 import {getOffSetDate} from './helpers';
 
 const helpers = require('./helpers');
@@ -46,12 +46,15 @@ export class GllueConsentLogic implements INodeType {
 
 		console.log('DEBUG:response data=', simpleData);
 
-		const consentAPI = new ConsentAPI(this.helpers.request);
 		const candidateData = Gllue.extractIdAndEmail(simpleData);
-		const consented = await consentAPI.getConsentedByCandidateId(candidateData.id);
+		const consentedEndpoint = new ConsentedConsentAPIEndpint(this.helpers.request, candidateData.id);
+		const consented = await consentedEndpoint.post();
 		console.log('DEBUG: consented row=', consented);
 		const date30DaysBefore = getOffSetDate(-30);
 		console.log('DEBUG: date =', date30DaysBefore);
+		const sentEndpoint = new SentConsentAPIEndpoint(this.helpers.request, candidateData.id, date30DaysBefore);
+		const sent = await sentEndpoint.post();
+		console.log('DEBUG: consent sent in 30 days=', sent);
 		return [this.helpers.returnJsonArray(consented)];
 	}
 
