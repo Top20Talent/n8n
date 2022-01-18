@@ -1,5 +1,6 @@
 import {convertEventPayload, getCurrentTimeStamp, UrlParams} from '../../../nodes/Gllue/helpers';
 import {GllueEvent} from '../../../nodes/Gllue/interfaces';
+import {BLUE_HOST} from '../../../nodes/Gllue/constants';
 
 
 const helpers = require('../../../nodes/Gllue/helpers');
@@ -57,7 +58,10 @@ const FIELDS = 'id,name';
 const GQL = 'type__s=prospect,client';
 const GQL_MULTIPLE = `${GQL}&keyword__eq=right`;
 const BASE_URL = `${HOST}\/rest\/${RESOURCE}\/${OPTION}`;
-const DEFAULT_PARAMS = `fields=id&paginate_by=25&ordering=-id&page=1&private_token=${TOKEN}`;
+const BLUE_BASE_URL = `${BLUE_HOST}\/rest\/${RESOURCE}\/${OPTION}`;
+const BASE_PARAMS = 'fields=id&paginate_by=25&ordering=-id&page=1';
+const DEFAULT_PARAMS = `${BASE_PARAMS}&private_token=${TOKEN}`;
+const BLUE_DEFAULT_PARAMS = `${BASE_PARAMS}&gllue_private_token=${TOKEN}`;
 
 describe('Gllue url parameters builder', () => {
 	it('should build base url', () => {
@@ -94,6 +98,12 @@ describe('Gllue url parameters builder', () => {
 		const url = helpers.gllueUrlBuilder(HOST, RESOURCE, OPTION, urlParams);
 		expect(url).toEqual(
 			`${BASE_URL}?gql=&${DEFAULT_PARAMS}`);
+	});
+		it('should build with blue token', () => {
+		const urlParams = new UrlParams('', 'id', TOKEN);
+		const url = helpers.gllueUrlBuilder(BLUE_HOST, RESOURCE, OPTION, urlParams);
+		expect(url).toEqual(
+			`${BLUE_BASE_URL}?gql=&${BLUE_DEFAULT_PARAMS}`);
 	});
 });
 

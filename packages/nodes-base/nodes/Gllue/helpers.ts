@@ -1,6 +1,7 @@
 import {OptionsWithUri} from 'request';
 import {IDataObject} from 'n8n-workflow';
 import {GllueEvent} from './interfaces';
+import {BLUE_HOST, BLUE_TOKEN_KEY, TOKEN_KEY} from './constants';
 
 const crypto = require('crypto');
 
@@ -80,7 +81,8 @@ export function gllueUrlBuilder(host: string, resource: string, option = 'simple
 	params.push(`page=${urlParams.page}`);
 
 	if (urlParams.token !== '') {
-		params.push(`private_token=${urlParams.token}`);
+		const tokenKey = host === BLUE_HOST ? BLUE_TOKEN_KEY : TOKEN_KEY;
+		params.push(`${tokenKey}=${urlParams.token}`);
 	} else {
 		throw new Error('Private Token is required');
 	}

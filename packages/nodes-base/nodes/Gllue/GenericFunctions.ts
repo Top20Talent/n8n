@@ -1,4 +1,6 @@
 import {Response} from 'express';
+import {getResponseByUri, gllueUrlBuilder, UrlParams} from './helpers';
+import {IDataObject} from 'n8n-workflow';
 
 
 interface NoWebhookResponse {
@@ -24,7 +26,7 @@ export class ErrorMessageBuilder {
 			message = 'Authorization is required!'; // TODO: magic string
 		} else if (responseCode === 403) {
 			message = 'Authorization data is wrong!';
-		}else if (responseCode === 202){
+		} else if (responseCode === 202) {
 			message = 'Skipped, event is not the same with webhook.';
 		}
 		return message;
@@ -49,7 +51,7 @@ export class TokenValidator {
 	private token: string | undefined;
 	private expectedToken: string;
 
-	constructor(token: string|undefined, expectedToken: string) {
+	constructor(token: string | undefined, expectedToken: string) {
 		this.token = token;
 		this.expectedToken = expectedToken;
 	}
@@ -64,7 +66,32 @@ export class TokenValidator {
 }
 
 export class EventChecker {
-	static isValid(payloadEvent:string, nodeEvent:string){
+	static isValid(payloadEvent: string, nodeEvent: string) {
 		return payloadEvent === nodeEvent;
+	}
+}
+
+
+// tslint:disable-next-line:no-any
+type N8nRequest = (uriOrObject: string | IDataObject | any, options?: IDataObject) => Promise<any>;
+
+export class Gllue {
+	apiHost = '';
+	token = '';
+	request:N8nRequest;
+	operation = 'simple_list_with_ids';
+
+	constructor(apiHost: string, token: string, request:N8nRequest) {
+		this.apiHost = apiHost;
+		this.token = token;
+		this.request = request;
+	}
+
+	async getDetail(resource: string, resourceId: number, fields?: string) {
+		const query = `id__eq=${resourceId}`;
+		const urlParams = new UrlParams(query, fields, this.token);
+		const uriGenerated = gllueUrlBuilder(this.apiHost, resource, this.operation, urlParams);
+
+		return await getResponseByUri(uriGenerated, this.request);
 	}
 }
