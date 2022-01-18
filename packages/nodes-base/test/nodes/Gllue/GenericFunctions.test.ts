@@ -66,9 +66,13 @@ describe('event check', () => {
 	});
 });
 
-const SIMPLE_RESPONSE = {ids: [1234], result: {
-	cvsent: [{id: 30817, gllueext_send_terms_cv_sent: 'yes'}],
-	candidate: [{id: 1234, email: 'fake@email.com'}]}};
+const SIMPLE_RESPONSE = {
+	ids: [1234],
+	result: {
+		cvsent: [{id: 30817, gllueext_send_terms_cv_sent: 'yes'}],
+		candidate: [{id: 1234, email: 'fake@email.com'}],
+	},
+};
 describe('gllue api', () => {
 	it('should parse id', () => {
 		const out = Gllue.extractIdAndEmail(SIMPLE_RESPONSE);
@@ -78,8 +82,9 @@ describe('gllue api', () => {
 		const out = Gllue.extractIdAndEmail(SIMPLE_RESPONSE);
 		expect(out.email).toEqual('fake@email.com');
 	});
-	it('should parse sent term on cv sent', ()=>{
+	it('should parse sent term on cv sent', () => {
 		const out = Gllue.extractIdAndEmail(SIMPLE_RESPONSE);
 		expect(out.cvsentField).toEqual('yes');
 	});
 });
+
