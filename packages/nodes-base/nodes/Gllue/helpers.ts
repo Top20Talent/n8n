@@ -2,6 +2,7 @@ import {OptionsWithUri} from 'request';
 import {IDataObject} from 'n8n-workflow';
 import {GllueEvent} from './interfaces';
 import {BLUE_HOST, BLUE_TOKEN_KEY, TOKEN_KEY} from './constants';
+import * as moment from 'moment-timezone';
 
 const crypto = require('crypto');
 
@@ -121,4 +122,9 @@ export function convertEventPayload(item: GllueEvent):IDataObject{
 		info,
 		sign: item.sign,
 	};
+}
+
+export function getOffSetDate(days: number):string{
+	const date = moment().add(days, 'days');
+	return date.format('YYYY-MM-DD');
 }

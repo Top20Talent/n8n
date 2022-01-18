@@ -2,6 +2,7 @@ import {IExecuteFunctions,} from 'n8n-core';
 
 import {IDataObject, INodeExecutionData, INodeType, INodeTypeDescription,} from 'n8n-workflow';
 import {ConsentAPI, Gllue} from './GenericFunctions';
+import {getOffSetDate} from './helpers';
 
 const helpers = require('./helpers');
 
@@ -49,6 +50,8 @@ export class GllueConsentLogic implements INodeType {
 		const candidateData = Gllue.extractIdAndEmail(simpleData);
 		const consented = await consentAPI.getConsentedByCandidateId(candidateData.id);
 		console.log('DEBUG: consented row=', consented);
+		const date30DaysBefore = getOffSetDate(-30);
+		console.log('DEBUG: date =', date30DaysBefore);
 		return [this.helpers.returnJsonArray(consented)];
 	}
 
