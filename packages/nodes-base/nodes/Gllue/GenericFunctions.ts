@@ -1,6 +1,7 @@
 import {Response} from 'express';
-import {getResponseByUri, gllueUrlBuilder, UrlParams} from './helpers';
+import {buildOptionWithUri, getResponseByUri, gllueUrlBuilder, UrlParams} from './helpers';
 import {IDataObject} from 'n8n-workflow';
+import {CvSentResponse} from './interfaces';
 
 
 interface NoWebhookResponse {
@@ -78,10 +79,10 @@ type N8nRequest = (uriOrObject: string | IDataObject | any, options?: IDataObjec
 export class Gllue {
 	apiHost = '';
 	token = '';
-	request:N8nRequest;
+	request: N8nRequest;
 	operation = 'simple_list_with_ids';
 
-	constructor(apiHost: string, token: string, request:N8nRequest) {
+	constructor(apiHost: string, token: string, request: N8nRequest) {
 		this.apiHost = apiHost;
 		this.token = token;
 		this.request = request;
@@ -93,5 +94,29 @@ export class Gllue {
 		const uriGenerated = gllueUrlBuilder(this.apiHost, resource, this.operation, urlParams);
 
 		return await getResponseByUri(uriGenerated, this.request);
+	}
+
+	static extractIdAndEmail(data: CvSentResponse) {
+		const firstCandidate = data.result.candidate[0];
+		return {id: firstCandidate.id, email: firstCandidate.email};
+	}
+}
+
+export class Hasura {
+	apiHost = 'http://localhost:8083/api/rest';
+	request: N8nRequest;
+
+	constructor(request: N8nRequest) {
+		this.request = request;
+	}
+
+}
+
+export class ConsentAPI extends Hasura {
+	async getConsentedByCandidateId(candidateId: number) {
+		const uri = `${this.apiHost}/consent/is-consented`;
+		const payload = {candidate_id: candidateId};
+		const options = buildOptionWithUri(uri, 'POST', payload);
+		return await this.request(options);
 	}
 }

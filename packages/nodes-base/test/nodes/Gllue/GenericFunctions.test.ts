@@ -1,4 +1,9 @@
-import {ErrorMessageBuilder, EventChecker, TokenValidator} from '../../../nodes/Gllue/GenericFunctions';
+import {
+	ErrorMessageBuilder,
+	EventChecker,
+	Gllue,
+	TokenValidator
+} from '../../../nodes/Gllue/GenericFunctions';
 import {CV_SENT_EVENT, INTERVIEW_EVENT} from '../../../nodes/Gllue/constants';
 
 describe('error message builder', () => {
@@ -28,35 +33,47 @@ describe('error message builder', () => {
 		builder.handle();
 		expect(resp.end).toHaveBeenCalledWith('Authorization is required!');
 	});
-	it('should set hander', ()=>{
+	it('should set hander', () => {
 		const resp = {writeHead: jest.fn(), end: jest.fn()};
 		const builder = new ErrorMessageBuilder(resp, 'webhook', 403);
 		builder.handle();
 		expect(resp.writeHead).toHaveBeenCalledWith(403, {'WWW-Authenticate': 'Basic realm="webhook"'});
 	});
-	it('should return no webhook response', ()=>{
+	it('should return no webhook response', () => {
 		const resp = {writeHead: jest.fn(), end: jest.fn()};
 		const builder = new ErrorMessageBuilder(resp, 'webhook', 403);
 		expect(builder.handle()).toEqual({noWebhookResponse: true});
 	});
 });
 
-describe('token validator', ()=>{
-	it('should miss on empty token', ()=>{
+describe('token validator', () => {
+	it('should miss on empty token', () => {
 		const validator = new TokenValidator(undefined, 'expected-token');
 		expect(validator.isMissing()).toBeTruthy();
 	});
-	it('should wrong on different token', ()=>{
+	it('should wrong on different token', () => {
 		const validator = new TokenValidator('token', 'expected-token');
 		expect(validator.isWrong()).toBeTruthy();
 	});
 });
 
-describe('event check', ()=>{
-	it('should be true on same event', ()=>{
+describe('event check', () => {
+	it('should be true on same event', () => {
 		expect(EventChecker.isValid('cvsent', CV_SENT_EVENT)).toBeTruthy();
 	});
-	it('should be false on different event', ()=>{
+	it('should be false on different event', () => {
 		expect(EventChecker.isValid('cvsent', INTERVIEW_EVENT)).toBeFalsy();
+	});
+});
+
+const SIMPLE_RESPONSE = {ids: [1234], result: {candidate: [{id: 1234, email: 'fake@email.com'}]}};
+describe('gllue api', () => {
+	it('should parse id', () => {
+		const out = Gllue.extractIdAndEmail(SIMPLE_RESPONSE);
+		expect(out.id).toEqual(1234);
+	});
+	it('should parse email', () => {
+		const out = Gllue.extractIdAndEmail(SIMPLE_RESPONSE);
+		expect(out.email).toEqual('fake@email.com');
 	});
 });
