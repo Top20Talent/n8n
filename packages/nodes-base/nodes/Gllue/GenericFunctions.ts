@@ -97,8 +97,9 @@ export class Gllue {
 	}
 
 	static extractIdAndEmail(data: CvSentResponse) {
+		const firstCvSent = data.result.cvsent[0];
 		const firstCandidate = data.result.candidate[0];
-		return {id: firstCandidate.id, email: firstCandidate.email};
+		return {id: firstCandidate.id, email: firstCandidate.email, cvsentField: firstCvSent.gllueext_send_terms_cv_sent};
 	}
 }
 

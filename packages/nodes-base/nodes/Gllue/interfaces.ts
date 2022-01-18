@@ -9,7 +9,15 @@ export interface CandidateResponse {
 	email: string;
 }
 
+export interface CvSentDetailResponse {
+	id: number;
+	gllueext_send_terms_cv_sent: string;
+}
+
 export interface CvSentResponse {
 	ids: number[];
-	result: { candidate: CandidateResponse[] };
+	result: {
+		cvsent: CvSentDetailResponse[];
+		candidate: CandidateResponse[]
+	};
 }

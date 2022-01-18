@@ -42,7 +42,8 @@ export class GllueConsentLogic implements INodeType {
 		const token = helpers.generateTokenWithAESKey(timestamp, credentials.apiUsername, credentials.apiAesKey);
 
 		const gllue = new Gllue(credentials.apiHost as string, token, this.helpers.request);
-		const simpleData = await gllue.getDetail(resource, resourceId, 'id,jobsubmission__candidate__email');
+		const simpleData = await gllue.getDetail(resource, resourceId,
+			'id,jobsubmission__candidate__email,gllueext_send_terms_cv_sent');
 
 		console.log('DEBUG:response data=', simpleData);
 
