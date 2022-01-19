@@ -5,3 +5,6 @@ export const INTERVIEW_EVENT = 'clientinterview';
 export const BLUE_HOST = 'https://cgpbrands.cgptalent.cn';
 export const TOKEN_KEY = 'private_token';
 export const BLUE_TOKEN_KEY = 'gllue_private_token';
+export const BLUE_GLLUE_SOURCE = 'Brands Gllue';
+export const EMAIL_CHANNEL = 'email';
+

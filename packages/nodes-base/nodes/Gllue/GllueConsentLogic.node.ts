@@ -1,8 +1,14 @@
 import {IExecuteFunctions,} from 'n8n-core';
 
 import {IDataObject, INodeExecutionData, INodeType, INodeTypeDescription,} from 'n8n-workflow';
-import {ConsentedConsentAPIEndpoint, Gllue, SendEmailOnConsentService, SentConsentAPIEndpoint} from './GenericFunctions';
-import {getOffSetDate} from './helpers';
+import {
+	ConsentedConsentAPIEndpoint,
+	CreateConsentAPIEndpoint,
+	Gllue,
+	SendEmailOnConsentService,
+	SentConsentAPIEndpoint
+} from './GenericFunctions';
+import {BLUE_GLLUE_SOURCE, EMAIL_CHANNEL} from './constants';
 
 const helpers = require('./helpers');
 
@@ -48,19 +54,26 @@ export class GllueConsentLogic implements INodeType {
 		console.log('DEBUG:response data=', JSON.stringify(simpleData));
 
 		const candidateData = Gllue.extractIdAndEmail(simpleData);
-		const consentedEndpoint = new ConsentedConsentAPIEndpoint(this.helpers.request, candidateData.id);
+		const consentedEndpoint = new ConsentedConsentAPIEndpoint(this.helpers.request, candidateData.id, BLUE_GLLUE_SOURCE, EMAIL_CHANNEL);
 		const consented = await consentedEndpoint.post();
 		console.log('DEBUG: consented row=', consented);
-		const sentEndpoint = new SentConsentAPIEndpoint(this.helpers.request, candidateData.id);
+		const sentEndpoint = new SentConsentAPIEndpoint(this.helpers.request, candidateData.id, BLUE_GLLUE_SOURCE, EMAIL_CHANNEL);
 		const sent = await sentEndpoint.post();
 		console.log('DEBUG: consent sent in 30 days=', sent);
 		const service = new SendEmailOnConsentService(consented, sent, candidateData.cvsentField);
 
-		const responseData = service.canSendEmail() ?  [candidateData] : [];
+		const responseData = service.canSendEmail() ? [candidateData] : [];
 		console.log('DEBUG: response=', responseData);
-		return  [this.helpers.returnJsonArray(responseData)];
+		const envVar = process.env.NODE_ENV;
+		console.log('DEBUG: env var=', envVar);
+
+		if (service.canSendEmail()) {
+			const saveEndpoint = new CreateConsentAPIEndpoint(this.helpers.request, candidateData.id, BLUE_GLLUE_SOURCE, EMAIL_CHANNEL);
+			const saved = await saveEndpoint.post();
+			console.log('DEBUG: saved consent', JSON.stringify(saved));
+		}
+		return [this.helpers.returnJsonArray(responseData)];
 
 	}
 
 }
-

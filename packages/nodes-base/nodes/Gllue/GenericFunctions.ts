@@ -133,13 +133,18 @@ export class Hasura {
 class ConsentAPI extends Hasura {
 	resource = 'consent';
 	candidateId: number;
+	source: string;
+	channel: string;
 
-	constructor(request: N8nRequest, candidateId: number) {
+	constructor(request: N8nRequest, candidateId: number, source: string, channel: string) {
 		super(request);
 		this.candidateId = candidateId;
+		this.source = source;
+		this.channel = channel;
 	}
 
 }
+
 export class ConsentedConsentAPIEndpoint extends ConsentAPI {
 	action = 'is-consented';
 
@@ -159,18 +164,31 @@ export class SentConsentAPIEndpoint extends ConsentAPI {
 	}
 }
 
+export class CreateConsentAPIEndpoint extends ConsentAPI {
+	action = 'add';
+
+	getPayload() {
+		const payload = super.getPayload();
+		return Object.assign(payload, {
+			candidate_id: this.candidateId,
+			source: this.source,
+			channel: this.channel,
+		});
+	}
+}
+
 export class SendEmailOnConsentService {
 	hasConsented: Consents;
 	hasSent: Consents;
-	hasRequired: string|null;
+	hasRequired: string | null;
 
-	constructor(hasConsented: Consents, hasSent: Consents, hasRequired:string|null) {
+	constructor(hasConsented: Consents, hasSent: Consents, hasRequired: string | null) {
 		this.hasConsented = hasConsented;
 		this.hasSent = hasSent;
 		this.hasRequired = hasRequired;
 	}
 
-	canSendEmail(){
+	canSendEmail() {
 		const hasConsented = this.hasConsented.consents.length > 0;
 		const hasSent = this.hasSent.consents.length > 0;
 		const hasRequired = this.hasRequired === 'yes';
