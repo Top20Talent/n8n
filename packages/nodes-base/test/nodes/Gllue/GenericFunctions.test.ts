@@ -1,7 +1,7 @@
 import {
 	ErrorMessageBuilder,
 	EventChecker,
-	Gllue,
+	Gllue, SendEmailOnConsentService,
 	TokenValidator
 } from '../../../nodes/Gllue/GenericFunctions';
 import {CV_SENT_EVENT, INTERVIEW_EVENT} from '../../../nodes/Gllue/constants';
@@ -88,3 +88,31 @@ describe('gllue api', () => {
 	});
 });
 
+describe('consent send email logic', () => {
+	it('should skip on consented', () => {
+		const hasConsented = {consents: [{id: 'foobar'}]};
+		const hasSent = {consents: []};
+		const service = new SendEmailOnConsentService(hasConsented, hasSent, null);
+		expect(service.canSendEmail()).toBeFalsy();
+	});
+	it('should skip on sent in 30 days', () => {
+		const hasConsented = {consents: []};
+		const hasSent = {consents: [{id: 'has sent in 30 days'}]};
+		const service = new SendEmailOnConsentService(hasConsented, hasSent, null);
+		expect(service.canSendEmail()).toBeFalsy();
+	});
+	it('should skip without required', () => {
+		const hasConsented = {consents: []};
+		const hasSent = {consents: []};
+		const hasRequired = null;
+		const service = new SendEmailOnConsentService(hasConsented, hasSent, hasRequired);
+		expect(service.canSendEmail()).toBeFalsy();
+	});
+	it('should send with required', () => {
+		const hasConsented = {consents: []};
+		const hasSent = {consents: []};
+		const hasRequired = 'yes';
+		const service = new SendEmailOnConsentService(hasConsented, hasSent, hasRequired);
+		expect(service.canSendEmail()).toBeTruthy();
+	});
+});

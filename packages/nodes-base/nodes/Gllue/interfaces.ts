@@ -21,3 +21,11 @@ export interface CvSentResponse {
 		candidate: CandidateResponse[]
 	};
 }
+
+interface Consent {
+	id: string;
+}
+
+export interface Consents {
+	consents: Consent[];
+}

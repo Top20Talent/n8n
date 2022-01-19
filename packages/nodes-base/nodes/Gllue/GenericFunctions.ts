@@ -1,7 +1,7 @@
 import {Response} from 'express';
 import {buildOptionWithUri, getResponseByUri, gllueUrlBuilder, UrlParams} from './helpers';
 import {IDataObject} from 'n8n-workflow';
-import {CvSentResponse} from './interfaces';
+import {Consents, CvSentResponse} from './interfaces';
 
 
 interface NoWebhookResponse {
@@ -157,5 +157,24 @@ export class SentConsentAPIEndpoint extends ConsentAPI {
 	getPayload() {
 		const payload = super.getPayload();
 		return Object.assign(payload, {candidate_id: this.candidateId, date_before_30_days: this.dateBefore});
+	}
+}
+
+export class SendEmailOnConsentService {
+	hasConsented: Consents;
+	hasSent: Consents;
+	hasRequired: string|null;
+
+	constructor(hasConsented: Consents, hasSent: Consents, hasRequired:string|null) {
+		this.hasConsented = hasConsented;
+		this.hasSent = hasSent;
+		this.hasRequired = hasRequired;
+	}
+
+	canSendEmail(){
+		const hasConsented = this.hasConsented.consents.length > 0;
+		const hasSent = this.hasSent.consents.length > 0;
+		const hasRequired = this.hasRequired === 'yes';
+		return !hasConsented && !hasSent && hasRequired;
 	}
 }
