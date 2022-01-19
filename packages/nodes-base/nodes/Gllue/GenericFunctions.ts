@@ -1,5 +1,5 @@
 import {Response} from 'express';
-import {buildOptionWithUri, getResponseByUri, gllueUrlBuilder, UrlParams} from './helpers';
+import {buildOptionWithUri, getOffSetDate, getResponseByUri, gllueUrlBuilder, UrlParams} from './helpers';
 import {IDataObject} from 'n8n-workflow';
 import {Consents, CvSentResponse} from './interfaces';
 
@@ -133,16 +133,14 @@ export class Hasura {
 class ConsentAPI extends Hasura {
 	resource = 'consent';
 	candidateId: number;
-	dateBefore: string | undefined;
 
-	constructor(request: N8nRequest, candidateId: number, dateBefore?: string) {
+	constructor(request: N8nRequest, candidateId: number) {
 		super(request);
 		this.candidateId = candidateId;
-		this.dateBefore = dateBefore;
 	}
 
 }
-export class ConsentedConsentAPIEndpint extends ConsentAPI {
+export class ConsentedConsentAPIEndpoint extends ConsentAPI {
 	action = 'is-consented';
 
 	getPayload() {
@@ -156,7 +154,8 @@ export class SentConsentAPIEndpoint extends ConsentAPI {
 
 	getPayload() {
 		const payload = super.getPayload();
-		return Object.assign(payload, {candidate_id: this.candidateId, date_before_30_days: this.dateBefore});
+		const date30DaysBefore = getOffSetDate(-30);
+		return Object.assign(payload, {candidate_id: this.candidateId, date_before_30_days: date30DaysBefore});
 	}
 }
 

@@ -1,7 +1,7 @@
 import {IExecuteFunctions,} from 'n8n-core';
 
 import {IDataObject, INodeExecutionData, INodeType, INodeTypeDescription,} from 'n8n-workflow';
-import {ConsentedConsentAPIEndpint, Gllue, SendEmailOnConsentService, SentConsentAPIEndpoint} from './GenericFunctions';
+import {ConsentedConsentAPIEndpoint, Gllue, SendEmailOnConsentService, SentConsentAPIEndpoint} from './GenericFunctions';
 import {getOffSetDate} from './helpers';
 
 const helpers = require('./helpers');
@@ -45,20 +45,19 @@ export class GllueConsentLogic implements INodeType {
 		const simpleData = await gllue.getDetail(resource, resourceId,
 			'id,jobsubmission__candidate__email,gllueext_send_terms_cv_sent');
 
-		console.log('DEBUG:response data=', simpleData);
+		console.log('DEBUG:response data=', JSON.stringify(simpleData));
 
 		const candidateData = Gllue.extractIdAndEmail(simpleData);
-		const consentedEndpoint = new ConsentedConsentAPIEndpint(this.helpers.request, candidateData.id);
+		const consentedEndpoint = new ConsentedConsentAPIEndpoint(this.helpers.request, candidateData.id);
 		const consented = await consentedEndpoint.post();
 		console.log('DEBUG: consented row=', consented);
-		const date30DaysBefore = getOffSetDate(-30);
-		console.log('DEBUG: date =', date30DaysBefore);
-		const sentEndpoint = new SentConsentAPIEndpoint(this.helpers.request, candidateData.id, date30DaysBefore);
+		const sentEndpoint = new SentConsentAPIEndpoint(this.helpers.request, candidateData.id);
 		const sent = await sentEndpoint.post();
 		console.log('DEBUG: consent sent in 30 days=', sent);
 		const service = new SendEmailOnConsentService(consented, sent, candidateData.cvsentField);
 
-		const responseData = service.canSendEmail() ?  candidateData : [];
+		const responseData = service.canSendEmail() ?  [candidateData] : [];
+		console.log('DEBUG: response=', responseData);
 		return  [this.helpers.returnJsonArray(responseData)];
 
 	}
