@@ -8,3 +8,4 @@ export const BLUE_TOKEN_KEY = 'gllue_private_token';
 export const BLUE_GLLUE_SOURCE = 'Brands Gllue';
 export const EMAIL_CHANNEL = 'email';
 
+export const VALID_GLLUE_SOURCES = [BLUE_GLLUE_SOURCE];

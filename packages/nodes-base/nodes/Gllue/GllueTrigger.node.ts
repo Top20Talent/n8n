@@ -2,7 +2,7 @@ import {IWebhookFunctions,} from 'n8n-core';
 
 import {IDataObject, INodeType, INodeTypeDescription, IWebhookResponseData,} from 'n8n-workflow';
 import {convertEventPayload} from './helpers';
-import {ErrorMessageBuilder, EventChecker, TokenValidator} from './GenericFunctions';
+import {ErrorMessageBuilder, EventChecker, SourceValidator, TokenValidator} from './GenericFunctions';
 
 export class GllueTrigger implements INodeType {
 	description: INodeTypeDescription = {
@@ -58,18 +58,22 @@ export class GllueTrigger implements INodeType {
 		const expectedToken = credentials.apiToken as string;
 		const req = this.getRequestObject();
 		const token = req.query.token as string;
+		const source = req.query.source as string;
 		const resp = this.getResponseObject();
 		const realm = 'Webhook';
 
-		const validator = new TokenValidator(token, expectedToken);
-		if (validator.isMissing()) {
+		const tokenValidator = new TokenValidator(token, expectedToken);
+		if (tokenValidator.isMissing()) {
 			const builder = new ErrorMessageBuilder(resp, realm, 401);
 			return builder.handle();
 		}
-		if (validator.isWrong()) {
+		if (tokenValidator.isWrong()) {
 			const builder = new ErrorMessageBuilder(resp, realm, 403);
 			return builder.handle();
 		}
+
+		const validator = new SourceValidator(req.query);
+		validator.check();
 
 		const item = convertEventPayload(req.body);
 		const event = this.getNodeParameter('event') as string;

@@ -77,3 +77,4 @@ export class GllueConsentLogic implements INodeType {
 	}
 
 }
+

@@ -2,7 +2,8 @@ import {Response} from 'express';
 import {buildOptionWithUri, getOffSetDate, getResponseByUri, gllueUrlBuilder, UrlParams} from './helpers';
 import {IDataObject} from 'n8n-workflow';
 import {Consents, CvSentResponse} from './interfaces';
-
+import {InValidSourceError, NoSourceError} from './errors';
+import {VALID_GLLUE_SOURCES} from './constants';
 
 interface NoWebhookResponse {
 	noWebhookResponse: boolean;
@@ -69,6 +70,31 @@ export class TokenValidator {
 export class EventChecker {
 	static isValid(payloadEvent: string, nodeEvent: string) {
 		return payloadEvent === nodeEvent;
+	}
+}
+
+interface GllueWebhookQuery {
+	token?: string;
+	source?: string;
+}
+
+export class SourceValidator {
+	query: GllueWebhookQuery;
+
+	constructor(query: GllueWebhookQuery) {
+		this.query = query;
+	}
+	check():void{
+		const sourceExist = this.query.source !== undefined;
+		if (!sourceExist){
+			throw new NoSourceError();
+		}
+		if (!this.isInList()){
+			throw new InValidSourceError();
+		}
+	}
+	isInList(){
+		return VALID_GLLUE_SOURCES.includes(this.query.source || '');
 	}
 }
 
@@ -195,3 +221,4 @@ export class SendEmailOnConsentService {
 		return !hasConsented && !hasSent && hasRequired;
 	}
 }
+
