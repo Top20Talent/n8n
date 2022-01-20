@@ -2,11 +2,9 @@ import {IExecuteFunctions,} from 'n8n-core';
 
 import {IDataObject, INodeExecutionData, INodeType, INodeTypeDescription,} from 'n8n-workflow';
 import {
-	ConsentedConsentAPIEndpoint,
-	CreateConsentAPIEndpoint,
+	ConsentService,
 	Gllue,
 	SendEmailOnConsentService,
-	SentConsentAPIEndpoint
 } from './GenericFunctions';
 import {BLUE_GLLUE_SOURCE, EMAIL_CHANNEL} from './constants';
 
@@ -54,12 +52,14 @@ export class GllueConsentLogic implements INodeType {
 		console.log('DEBUG:response data=', JSON.stringify(simpleData));
 
 		const candidateData = Gllue.extractIdAndEmail(simpleData);
-		const consentedEndpoint = new ConsentedConsentAPIEndpoint(this.helpers.request, candidateData.id, BLUE_GLLUE_SOURCE, EMAIL_CHANNEL);
-		const consented = await consentedEndpoint.post();
+		const consentService = new ConsentService(this.helpers.request);
+
+		const consented = await consentService.getConsented(candidateData.id, BLUE_GLLUE_SOURCE, EMAIL_CHANNEL);
 		console.log('DEBUG: consented row=', consented);
-		const sentEndpoint = new SentConsentAPIEndpoint(this.helpers.request, candidateData.id, BLUE_GLLUE_SOURCE, EMAIL_CHANNEL);
-		const sent = await sentEndpoint.post();
+
+		const sent = await consentService.getSentIn30Days(candidateData.id, BLUE_GLLUE_SOURCE, EMAIL_CHANNEL);
 		console.log('DEBUG: consent sent in 30 days=', sent);
+
 		const service = new SendEmailOnConsentService(consented, sent, candidateData.cvsentField);
 
 		const responseData = service.canSendEmail() ? [candidateData] : [];
@@ -68,8 +68,7 @@ export class GllueConsentLogic implements INodeType {
 		console.log('DEBUG: env var=', envVar);
 
 		if (service.canSendEmail()) {
-			const saveEndpoint = new CreateConsentAPIEndpoint(this.helpers.request, candidateData.id, BLUE_GLLUE_SOURCE, EMAIL_CHANNEL);
-			const saved = await saveEndpoint.post();
+			const saved = await consentService.create(candidateData.id, BLUE_GLLUE_SOURCE, EMAIL_CHANNEL);
 			console.log('DEBUG: saved consent', JSON.stringify(saved));
 		}
 		return [this.helpers.returnJsonArray(responseData)];

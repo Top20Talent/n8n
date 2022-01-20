@@ -1,4 +1,4 @@
-import { Response } from 'express';
+import {Response} from 'express';
 import {
 	buildOptionWithUri,
 	getOffSetDate,
@@ -6,10 +6,10 @@ import {
 	gllueUrlBuilder,
 	UrlParams,
 } from './helpers';
-import { IDataObject } from 'n8n-workflow';
-import { Consents, CvSentResponse } from './interfaces';
+import {IDataObject} from 'n8n-workflow';
+import {Consents, CvSentResponse} from './interfaces';
 
-import { VALID_GLLUE_SOURCES } from './constants';
+import {VALID_GLLUE_SOURCES} from './constants';
 
 interface NoWebhookResponse {
 	noWebhookResponse: boolean;
@@ -42,7 +42,7 @@ export class ErrorMessageBuilder {
 	}
 
 	static getHeader(realm: string): { 'WWW-Authenticate': string } {
-		return { 'WWW-Authenticate': `Basic realm="${realm}"` };
+		return {'WWW-Authenticate': `Basic realm="${realm}"`};
 	}
 
 	handle(): NoWebhookResponse {
@@ -91,6 +91,7 @@ export class SourceValidator {
 	constructor(query: GllueWebhookQuery) {
 		this.query = query;
 	}
+
 	check(): void {
 		const sourceExist = this.query.source !== undefined;
 		if (!sourceExist) {
@@ -100,6 +101,7 @@ export class SourceValidator {
 			throw new Error(`"${this.query.source}" not in the valid list of [${VALID_GLLUE_SOURCES}]`);
 		}
 	}
+
 	isInList() {
 		return VALID_GLLUE_SOURCES.includes(this.query.source || '');
 	}
@@ -153,13 +155,8 @@ export class Hasura {
 		return `${this.apiHost}/${this.resource}/${this.action}`;
 	}
 
-	getPayload() {
-		return {};
-	}
-
-	async post() {
+	async post(payload: IDataObject) {
 		const uri = this.getUrl();
-		const payload = this.getPayload();
 		const options = buildOptionWithUri(uri, 'POST', payload);
 		return await this.request(options);
 	}
@@ -167,50 +164,58 @@ export class Hasura {
 
 class ConsentAPI extends Hasura {
 	resource = 'consent';
-	candidateId: number;
-	source: string;
-	channel: string;
-
-	constructor(request: N8nRequest, candidateId: number, source: string, channel: string) {
-		super(request);
-		this.candidateId = candidateId;
-		this.source = source;
-		this.channel = channel;
-	}
 }
 
 export class ConsentedConsentAPIEndpoint extends ConsentAPI {
 	action = 'is-consented';
-
-	getPayload() {
-		const payload = super.getPayload();
-		return Object.assign(payload, { candidate_id: this.candidateId });
-	}
 }
 
 export class SentConsentAPIEndpoint extends ConsentAPI {
 	action = 'is-sent-30-days';
-
-	getPayload() {
-		const payload = super.getPayload();
-		const date30DaysBefore = getOffSetDate(-30);
-		return Object.assign(payload, {
-			candidate_id: this.candidateId,
-			date_before_30_days: date30DaysBefore,
-		});
-	}
 }
 
-export class CreateConsentAPIEndpoint extends ConsentAPI {
+class CreateConsentAPIEndpoint extends ConsentAPI {
 	action = 'add';
+}
 
-	getPayload() {
-		const payload = super.getPayload();
-		return Object.assign(payload, {
-			candidate_id: this.candidateId,
-			source: this.source,
-			channel: this.channel,
-		});
+export class ConsentService {
+	createEndpoint: CreateConsentAPIEndpoint;
+	getSentBeforeDateEndpoint: SentConsentAPIEndpoint;
+	getConsentedByCandidateEndpoint: ConsentedConsentAPIEndpoint;
+
+
+	constructor(request: N8nRequest) {
+		this.createEndpoint = new CreateConsentAPIEndpoint(request);
+		this.getSentBeforeDateEndpoint = new SentConsentAPIEndpoint(request);
+		this.getConsentedByCandidateEndpoint = new ConsentedConsentAPIEndpoint(request);
+	}
+
+	async create(candidateId: number, source: string, channel: string): Promise<IDataObject> {
+		const data = {
+			candidate_id: candidateId,
+			source,
+			channel,
+		};
+		return await this.createEndpoint.post(data);
+	}
+
+	async getSentIn30Days(candidateId: number, source: string, channel: string) {
+		const data = {
+			candidate_id: candidateId,
+			date_before_30_days: getOffSetDate(-30),
+			source,
+			channel,
+		};
+		return await this.getSentBeforeDateEndpoint.post(data);
+	}
+
+	async getConsented(candidateId: number, source: string, channel: string) {
+		const data = {
+			candidate_id: candidateId,
+			source,
+			channel,
+		};
+		return await this.getConsentedByCandidateEndpoint.post(data);
 	}
 }
 
