@@ -9,3 +9,6 @@ export const BLUE_GLLUE_SOURCE = 'Brands Gllue';
 export const EMAIL_CHANNEL = 'email';
 
 export const VALID_GLLUE_SOURCES = [BLUE_GLLUE_SOURCE];
+
+export const CONSENT_FROM_EMAIL = 'no-reply@cgpo2o.com';
+export const CONSENT_EMAIL_TYPE = 'CandidateConsentRequestEmail';

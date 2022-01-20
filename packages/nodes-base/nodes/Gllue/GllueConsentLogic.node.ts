@@ -2,11 +2,11 @@ import {IExecuteFunctions,} from 'n8n-core';
 
 import {IDataObject, INodeExecutionData, INodeType, INodeTypeDescription,} from 'n8n-workflow';
 import {
-	ConsentService,
+	ConsentService, EmailNotificationService,
 	Gllue,
 	SendEmailOnConsentService,
 } from './GenericFunctions';
-import {BLUE_GLLUE_SOURCE, EMAIL_CHANNEL} from './constants';
+import {CONSENT_EMAIL_TYPE, CONSENT_FROM_EMAIL, EMAIL_CHANNEL} from './constants';
 
 const helpers = require('./helpers');
 
@@ -71,6 +71,10 @@ export class GllueConsentLogic implements INodeType {
 		if (service.canSendEmail()) {
 			const saved = await consentService.create(candidateData.id, source, EMAIL_CHANNEL);
 			console.log('DEBUG: saved consent', JSON.stringify(saved));
+			const emailService = new EmailNotificationService(this.helpers.request);
+			const email = await emailService.saveConsentEmail(candidateData.email);
+			const track_id = email.insert_email_notification.returning[0].track_id;
+			console.log('DEBUG: track_id', track_id);
 		}
 		return [this.helpers.returnJsonArray(responseData)];
 

@@ -9,7 +9,7 @@ import {
 import {IDataObject} from 'n8n-workflow';
 import {Consents, CvSentResponse} from './interfaces';
 
-import {VALID_GLLUE_SOURCES} from './constants';
+import {CONSENT_EMAIL_TYPE, CONSENT_FROM_EMAIL, VALID_GLLUE_SOURCES} from './constants';
 
 interface NoWebhookResponse {
 	noWebhookResponse: boolean;
@@ -235,5 +235,32 @@ export class SendEmailOnConsentService {
 		const hasSent = this.hasSent.consents.length > 0;
 		const hasRequired = this.hasRequired === 'yes';
 		return !hasConsented && !hasSent && hasRequired;
+	}
+}
+
+class EmailNotificationAPI extends Hasura{
+	resource = 'email';
+}
+
+class SaveEmailEndpoint extends EmailNotificationAPI{
+	action = 'add';
+}
+
+export class EmailNotificationService {
+	createEndpoint: SaveEmailEndpoint;
+
+	constructor(request: N8nRequest) {
+		this.createEndpoint = new SaveEmailEndpoint(request);
+	}
+
+	async create(from: string, to: string, type: string){
+		const data = {
+			from, to, type,
+		};
+		return await this.createEndpoint.post(data);
+	}
+
+	async saveConsentEmail(email: string){
+		return await this.create(CONSENT_FROM_EMAIL, email, CONSENT_EMAIL_TYPE);
 	}
 }
