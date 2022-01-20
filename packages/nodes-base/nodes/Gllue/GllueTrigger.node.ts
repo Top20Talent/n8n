@@ -85,7 +85,8 @@ export class GllueTrigger implements INodeType {
 		const event = this.getNodeParameter('event') as string;
 		// @ts-ignore
 		if (EventChecker.isValid(item.info.trigger_model_name, event)) {
-			return { workflowData: [this.helpers.returnJsonArray(item)] };
+			const data = Object.assign(item, {source});
+			return { workflowData: [this.helpers.returnJsonArray(data)] };
 		} else {
 			const builder = new ErrorMessageBuilder(resp, realm, 202);
 			return builder.handle();

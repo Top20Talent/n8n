@@ -52,12 +52,13 @@ export class GllueConsentLogic implements INodeType {
 		console.log('DEBUG:response data=', JSON.stringify(simpleData));
 
 		const candidateData = Gllue.extractIdAndEmail(simpleData);
+		const source = item.source as string;
 		const consentService = new ConsentService(this.helpers.request);
 
-		const consented = await consentService.getConsented(candidateData.id, BLUE_GLLUE_SOURCE, EMAIL_CHANNEL);
+		const consented = await consentService.getConsented(candidateData.id, source, EMAIL_CHANNEL);
 		console.log('DEBUG: consented row=', consented);
 
-		const sent = await consentService.getSentIn30Days(candidateData.id, BLUE_GLLUE_SOURCE, EMAIL_CHANNEL);
+		const sent = await consentService.getSentIn30Days(candidateData.id, source, EMAIL_CHANNEL);
 		console.log('DEBUG: consent sent in 30 days=', sent);
 
 		const service = new SendEmailOnConsentService(consented, sent, candidateData.cvsentField);
@@ -68,7 +69,7 @@ export class GllueConsentLogic implements INodeType {
 		console.log('DEBUG: env var=', envVar);
 
 		if (service.canSendEmail()) {
-			const saved = await consentService.create(candidateData.id, BLUE_GLLUE_SOURCE, EMAIL_CHANNEL);
+			const saved = await consentService.create(candidateData.id, source, EMAIL_CHANNEL);
 			console.log('DEBUG: saved consent', JSON.stringify(saved));
 		}
 		return [this.helpers.returnJsonArray(responseData)];
