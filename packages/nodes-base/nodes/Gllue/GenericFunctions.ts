@@ -143,20 +143,22 @@ export class Gllue {
 
 export class Hasura {
 	apiHost = 'http://localhost:8083/api/rest';
-	resource = '';
-	action = '';
+	resource = 'default-resource';
+	action = 'default-action';
 	request: N8nRequest;
 
 	constructor(request: N8nRequest) {
 		this.request = request;
 	}
 
-	getUrl() {
-		return `${this.apiHost}/${this.resource}/${this.action}`;
+	getUrl(id?: string) {
+		const normalUri = `${this.apiHost}/${this.resource}/${this.action}`;
+		const idUri = `${this.apiHost}/${this.resource}/${id}/${this.action}`;
+		return id ? idUri : normalUri;
 	}
 
 	async post(payload: IDataObject) {
-		const uri = this.getUrl();
+		const uri = this.getUrl(payload.id as string);
 		const options = buildOptionWithUri(uri, 'POST', payload);
 		return await this.request(options);
 	}
@@ -178,16 +180,23 @@ class CreateConsentAPIEndpoint extends ConsentAPI {
 	action = 'add';
 }
 
+class UpdateConsentAPIEndpoint extends ConsentAPI {
+	action = 'update';
+
+}
+
 export class ConsentService {
 	createEndpoint: CreateConsentAPIEndpoint;
 	getSentBeforeDateEndpoint: SentConsentAPIEndpoint;
 	getConsentedByCandidateEndpoint: ConsentedConsentAPIEndpoint;
+	updateWithIdEndpoint: UpdateConsentAPIEndpoint;
 
 
 	constructor(request: N8nRequest) {
 		this.createEndpoint = new CreateConsentAPIEndpoint(request);
 		this.getSentBeforeDateEndpoint = new SentConsentAPIEndpoint(request);
 		this.getConsentedByCandidateEndpoint = new ConsentedConsentAPIEndpoint(request);
+		this.updateWithIdEndpoint = new UpdateConsentAPIEndpoint(request);
 	}
 
 	async create(candidateId: number, source: string, channel: string): Promise<IDataObject> {
@@ -196,7 +205,23 @@ export class ConsentService {
 			source,
 			channel,
 		};
-		return await this.createEndpoint.post(data);
+		const resp = await this.createEndpoint.post(data);
+		return resp.insert_consents.returning[0];
+	}
+
+	async update(id: string, data: IDataObject) {
+		const payload = {
+			id,
+			data,
+		};
+		return await this.updateWithIdEndpoint.post(payload);
+	}
+
+	async updateTrackId(id: string, trackId: string) {
+		const payload = {
+			message_track_id: trackId,
+		};
+		return await this.update(id, payload);
 	}
 
 	async getSentIn30Days(candidateId: number, source: string, channel: string) {
@@ -238,11 +263,11 @@ export class SendEmailOnConsentService {
 	}
 }
 
-class EmailNotificationAPI extends Hasura{
+class EmailNotificationAPI extends Hasura {
 	resource = 'email';
 }
 
-class SaveEmailEndpoint extends EmailNotificationAPI{
+class SaveEmailEndpoint extends EmailNotificationAPI {
 	action = 'add';
 }
 
@@ -253,14 +278,14 @@ export class EmailNotificationService {
 		this.createEndpoint = new SaveEmailEndpoint(request);
 	}
 
-	async create(from: string, to: string, type: string){
+	async create(from: string, to: string, type: string) {
 		const data = {
 			from, to, type,
 		};
 		return await this.createEndpoint.post(data);
 	}
 
-	async saveConsentEmail(email: string){
+	async saveConsentEmail(email: string) {
 		return await this.create(CONSENT_FROM_EMAIL, email, CONSENT_EMAIL_TYPE);
 	}
 }

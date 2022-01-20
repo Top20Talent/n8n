@@ -75,6 +75,9 @@ export class GllueConsentLogic implements INodeType {
 			const email = await emailService.saveConsentEmail(candidateData.email);
 			const track_id = email.insert_email_notification.returning[0].track_id;
 			console.log('DEBUG: track_id', track_id);
+
+			const updated = await consentService.updateTrackId(saved.id as string, track_id);
+			console.log('DEBUG: updated=', updated);
 		}
 		return [this.helpers.returnJsonArray(responseData)];
 

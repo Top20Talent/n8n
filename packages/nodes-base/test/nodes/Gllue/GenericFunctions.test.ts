@@ -1,12 +1,13 @@
 import {
 	ErrorMessageBuilder,
 	EventChecker,
-	Gllue,
+	Gllue, Hasura,
 	SendEmailOnConsentService,
 	SourceValidator,
 	TokenValidator,
 } from '../../../nodes/Gllue/GenericFunctions';
-import { CV_SENT_EVENT, INTERVIEW_EVENT } from '../../../nodes/Gllue/constants';
+import {CV_SENT_EVENT, INTERVIEW_EVENT} from '../../../nodes/Gllue/constants';
+
 
 describe('error message builder', () => {
 	it('should return on undefined', () => {
@@ -27,16 +28,16 @@ describe('error message builder', () => {
 	});
 	it('should build headers with realm', () => {
 		const header = ErrorMessageBuilder.getHeader('webhook');
-		expect(header).toEqual({ 'WWW-Authenticate': 'Basic realm="webhook"' });
+		expect(header).toEqual({'WWW-Authenticate': 'Basic realm="webhook"'});
 	});
 	it('should set message', () => {
-		const resp = { writeHead: jest.fn(), end: jest.fn() };
+		const resp = {writeHead: jest.fn(), end: jest.fn()};
 		const builder = new ErrorMessageBuilder(resp, 'webhook', 401);
 		builder.handle();
 		expect(resp.end).toHaveBeenCalledWith('Authorization is required!');
 	});
 	it('should set hander', () => {
-		const resp = { writeHead: jest.fn(), end: jest.fn() };
+		const resp = {writeHead: jest.fn(), end: jest.fn()};
 		const builder = new ErrorMessageBuilder(resp, 'webhook', 403);
 		builder.handle();
 		expect(resp.writeHead).toHaveBeenCalledWith(403, {
@@ -44,9 +45,9 @@ describe('error message builder', () => {
 		});
 	});
 	it('should return no webhook response', () => {
-		const resp = { writeHead: jest.fn(), end: jest.fn() };
+		const resp = {writeHead: jest.fn(), end: jest.fn()};
 		const builder = new ErrorMessageBuilder(resp, 'webhook', 403);
-		expect(builder.handle()).toEqual({ noWebhookResponse: true });
+		expect(builder.handle()).toEqual({noWebhookResponse: true});
 	});
 });
 
@@ -73,8 +74,8 @@ describe('event check', () => {
 const SIMPLE_RESPONSE = {
 	ids: [1234],
 	result: {
-		cvsent: [{ id: 30817, gllueext_send_terms_cv_sent: 'yes' }],
-		candidate: [{ id: 1234, email: 'fake@email.com' }],
+		cvsent: [{id: 30817, gllueext_send_terms_cv_sent: 'yes'}],
+		candidate: [{id: 1234, email: 'fake@email.com'}],
 	},
 };
 describe('gllue api', () => {
@@ -94,27 +95,27 @@ describe('gllue api', () => {
 
 describe('consent send email logic', () => {
 	it('should skip on consented', () => {
-		const hasConsented = { consents: [{ id: 'foobar' }] };
-		const hasSent = { consents: [] };
+		const hasConsented = {consents: [{id: 'foobar'}]};
+		const hasSent = {consents: []};
 		const service = new SendEmailOnConsentService(hasConsented, hasSent, null);
 		expect(service.canSendEmail()).toBeFalsy();
 	});
 	it('should skip on sent in 30 days', () => {
-		const hasConsented = { consents: [] };
-		const hasSent = { consents: [{ id: 'has sent in 30 days' }] };
+		const hasConsented = {consents: []};
+		const hasSent = {consents: [{id: 'has sent in 30 days'}]};
 		const service = new SendEmailOnConsentService(hasConsented, hasSent, null);
 		expect(service.canSendEmail()).toBeFalsy();
 	});
 	it('should skip without required', () => {
-		const hasConsented = { consents: [] };
-		const hasSent = { consents: [] };
+		const hasConsented = {consents: []};
+		const hasSent = {consents: []};
 		const hasRequired = null;
 		const service = new SendEmailOnConsentService(hasConsented, hasSent, hasRequired);
 		expect(service.canSendEmail()).toBeFalsy();
 	});
 	it('should send with required', () => {
-		const hasConsented = { consents: [] };
-		const hasSent = { consents: [] };
+		const hasConsented = {consents: []};
+		const hasSent = {consents: []};
 		const hasRequired = 'yes';
 		const service = new SendEmailOnConsentService(hasConsented, hasSent, hasRequired);
 		expect(service.canSendEmail()).toBeTruthy();
@@ -129,9 +130,26 @@ describe('gllue webhook validator', () => {
 		}).toThrowError(new Error('Missing source in query of request'));
 	});
 	it('raise on invalid source', () => {
-		const validator = new SourceValidator({ source: 'Fake Gllue' });
+		const validator = new SourceValidator({source: 'Fake Gllue'});
 		expect(() => {
 			validator.check();
 		}).toThrowError(new Error('"Fake Gllue" not in the valid list of [Brands Gllue]'));
+	});
+});
+
+
+describe('Hasura Service', () => {
+	it('should build uri with source and action', () => {
+		const hasura = new Hasura(jest.fn());
+		expect(hasura.getUrl()).toEqual('http://localhost:8083/api/rest/default-resource/default-action');
+	});
+
+	it('should build uri with undefined id', () => {
+		const hasura = new Hasura(jest.fn());
+		expect(hasura.getUrl(undefined)).toEqual('http://localhost:8083/api/rest/default-resource/default-action');
+	});
+	it('should build uri with :id', () => {
+		const hasura = new Hasura(jest.fn());
+		expect(hasura.getUrl('fake-id-xxx')).toEqual('http://localhost:8083/api/rest/default-resource/fake-id-xxx/default-action');
 	});
 });
