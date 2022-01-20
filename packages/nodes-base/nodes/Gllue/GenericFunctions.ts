@@ -1,9 +1,15 @@
-import {Response} from 'express';
-import {buildOptionWithUri, getOffSetDate, getResponseByUri, gllueUrlBuilder, UrlParams} from './helpers';
-import {IDataObject} from 'n8n-workflow';
-import {Consents, CvSentResponse} from './interfaces';
-import {InValidSourceError, NoSourceError} from './errors';
-import {VALID_GLLUE_SOURCES} from './constants';
+import { Response } from 'express';
+import {
+	buildOptionWithUri,
+	getOffSetDate,
+	getResponseByUri,
+	gllueUrlBuilder,
+	UrlParams,
+} from './helpers';
+import { IDataObject } from 'n8n-workflow';
+import { Consents, CvSentResponse } from './interfaces';
+
+import { VALID_GLLUE_SOURCES } from './constants';
 
 interface NoWebhookResponse {
 	noWebhookResponse: boolean;
@@ -24,7 +30,8 @@ export class ErrorMessageBuilder {
 
 	static getMessage(responseCode?: number): string {
 		let message = 'Authorization problem!';
-		if (responseCode === 401) { // TODO: magic number
+		if (responseCode === 401) {
+			// TODO: magic number
 			message = 'Authorization is required!'; // TODO: magic string
 		} else if (responseCode === 403) {
 			message = 'Authorization data is wrong!';
@@ -35,7 +42,7 @@ export class ErrorMessageBuilder {
 	}
 
 	static getHeader(realm: string): { 'WWW-Authenticate': string } {
-		return {'WWW-Authenticate': `Basic realm="${realm}"`};
+		return { 'WWW-Authenticate': `Basic realm="${realm}"` };
 	}
 
 	handle(): NoWebhookResponse {
@@ -84,20 +91,19 @@ export class SourceValidator {
 	constructor(query: GllueWebhookQuery) {
 		this.query = query;
 	}
-	check():void{
+	check(): void {
 		const sourceExist = this.query.source !== undefined;
-		if (!sourceExist){
-			throw new NoSourceError();
+		if (!sourceExist) {
+			throw new Error('Missing source in query of request');
 		}
-		if (!this.isInList()){
-			throw new InValidSourceError();
+		if (!this.isInList()) {
+			throw new Error(`"${this.query.source}" not in the valid list of [${VALID_GLLUE_SOURCES}]`);
 		}
 	}
-	isInList(){
+	isInList() {
 		return VALID_GLLUE_SOURCES.includes(this.query.source || '');
 	}
 }
-
 
 // tslint:disable-next-line:no-any
 type N8nRequest = (uriOrObject: string | IDataObject | any, options?: IDataObject) => Promise<any>;
@@ -125,7 +131,11 @@ export class Gllue {
 	static extractIdAndEmail(data: CvSentResponse) {
 		const firstCvSent = data.result.cvsent[0];
 		const firstCandidate = data.result.candidate[0];
-		return {id: firstCandidate.id, email: firstCandidate.email, cvsentField: firstCvSent.gllueext_send_terms_cv_sent};
+		return {
+			id: firstCandidate.id,
+			email: firstCandidate.email,
+			cvsentField: firstCvSent.gllueext_send_terms_cv_sent,
+		};
 	}
 }
 
@@ -152,7 +162,6 @@ export class Hasura {
 		const payload = this.getPayload();
 		const options = buildOptionWithUri(uri, 'POST', payload);
 		return await this.request(options);
-
 	}
 }
 
@@ -168,7 +177,6 @@ class ConsentAPI extends Hasura {
 		this.source = source;
 		this.channel = channel;
 	}
-
 }
 
 export class ConsentedConsentAPIEndpoint extends ConsentAPI {
@@ -176,7 +184,7 @@ export class ConsentedConsentAPIEndpoint extends ConsentAPI {
 
 	getPayload() {
 		const payload = super.getPayload();
-		return Object.assign(payload, {candidate_id: this.candidateId});
+		return Object.assign(payload, { candidate_id: this.candidateId });
 	}
 }
 
@@ -186,7 +194,10 @@ export class SentConsentAPIEndpoint extends ConsentAPI {
 	getPayload() {
 		const payload = super.getPayload();
 		const date30DaysBefore = getOffSetDate(-30);
-		return Object.assign(payload, {candidate_id: this.candidateId, date_before_30_days: date30DaysBefore});
+		return Object.assign(payload, {
+			candidate_id: this.candidateId,
+			date_before_30_days: date30DaysBefore,
+		});
 	}
 }
 
@@ -221,4 +232,3 @@ export class SendEmailOnConsentService {
 		return !hasConsented && !hasSent && hasRequired;
 	}
 }
-

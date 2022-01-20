@@ -1,8 +1,13 @@
-import {IWebhookFunctions,} from 'n8n-core';
+import { IWebhookFunctions } from 'n8n-core';
 
-import {IDataObject, INodeType, INodeTypeDescription, IWebhookResponseData,} from 'n8n-workflow';
-import {convertEventPayload} from './helpers';
-import {ErrorMessageBuilder, EventChecker, SourceValidator, TokenValidator} from './GenericFunctions';
+import { IDataObject, INodeType, INodeTypeDescription, IWebhookResponseData } from 'n8n-workflow';
+import { convertEventPayload } from './helpers';
+import {
+	ErrorMessageBuilder,
+	EventChecker,
+	SourceValidator,
+	TokenValidator,
+} from './GenericFunctions';
 
 export class GllueTrigger implements INodeType {
 	description: INodeTypeDescription = {
@@ -33,28 +38,29 @@ export class GllueTrigger implements INodeType {
 				path: 'webhook',
 			},
 		],
-		properties: [{
-			displayName: 'Event',
-			name: 'event',
-			type: 'options',
-			required: true,
-			default: '',
-			options: [
-				{
-					name: 'CV Sent',
-					value: 'cvsent',
-				},
-				{
-					name: 'Interview',
-					value: 'clientinterview',
-				},
-			],
-		},
+		properties: [
+			{
+				displayName: 'Event',
+				name: 'event',
+				type: 'options',
+				required: true,
+				default: '',
+				options: [
+					{
+						name: 'CV Sent',
+						value: 'cvsent',
+					},
+					{
+						name: 'Interview',
+						value: 'clientinterview',
+					},
+				],
+			},
 		],
 	};
 
 	async webhook(this: IWebhookFunctions): Promise<IWebhookResponseData> {
-		const credentials = await this.getCredentials('gllueTriggerApi') as IDataObject;
+		const credentials = (await this.getCredentials('gllueTriggerApi')) as IDataObject;
 		const expectedToken = credentials.apiToken as string;
 		const req = this.getRequestObject();
 		const token = req.query.token as string;
@@ -79,7 +85,7 @@ export class GllueTrigger implements INodeType {
 		const event = this.getNodeParameter('event') as string;
 		// @ts-ignore
 		if (EventChecker.isValid(item.info.trigger_model_name, event)) {
-			return {workflowData: [this.helpers.returnJsonArray(item)],};
+			return { workflowData: [this.helpers.returnJsonArray(item)] };
 		} else {
 			const builder = new ErrorMessageBuilder(resp, realm, 202);
 			return builder.handle();

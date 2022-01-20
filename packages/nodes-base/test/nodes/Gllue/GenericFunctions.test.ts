@@ -7,7 +7,6 @@ import {
 	TokenValidator,
 } from '../../../nodes/Gllue/GenericFunctions';
 import { CV_SENT_EVENT, INTERVIEW_EVENT } from '../../../nodes/Gllue/constants';
-import { InValidSourceError, NoSourceError } from '../../../nodes/Gllue/errors';
 
 describe('error message builder', () => {
 	it('should return on undefined', () => {
@@ -127,12 +126,12 @@ describe('gllue webhook validator', () => {
 		const validator = new SourceValidator({});
 		expect(() => {
 			validator.check();
-		}).toThrowError(new NoSourceError());
+		}).toThrowError(new Error('Missing source in query of request'));
 	});
 	it('raise on invalid source', () => {
 		const validator = new SourceValidator({ source: 'Fake Gllue' });
 		expect(() => {
 			validator.check();
-		}).toThrowError(new InValidSourceError());
+		}).toThrowError(new Error('"Fake Gllue" not in the valid list of [Brands Gllue]'));
 	});
 });
