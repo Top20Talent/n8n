@@ -1,7 +1,7 @@
-import { IWebhookFunctions } from 'n8n-core';
+import {IWebhookFunctions} from 'n8n-core';
 
-import { IDataObject, INodeType, INodeTypeDescription, IWebhookResponseData } from 'n8n-workflow';
-import { convertEventPayload } from './helpers';
+import {IDataObject, INodeType, INodeTypeDescription, IWebhookResponseData} from 'n8n-workflow';
+import {convertEventPayload} from './helpers';
 import {
 	ErrorMessageBuilder,
 	EventChecker,
@@ -34,11 +34,21 @@ export class GllueTrigger implements INodeType {
 			{
 				name: 'default',
 				httpMethod: 'POST',
+				isFullPath: true,
 				responseMode: 'onReceived',
-				path: 'webhook',
+				path: '={{$parameter["path"]}}',
 			},
 		],
 		properties: [
+			{
+				displayName: 'Path',
+				name: 'path',
+				type: 'string',
+				default: '',
+				placeholder: 'webhook',
+				required: true,
+				description: 'The path to listen to.',
+			},
 			{
 				displayName: 'Event',
 				name: 'event',
@@ -86,7 +96,7 @@ export class GllueTrigger implements INodeType {
 		// @ts-ignore
 		if (EventChecker.isValid(item.info.trigger_model_name, event)) {
 			const data = Object.assign(item, {source});
-			return { workflowData: [this.helpers.returnJsonArray(data)] };
+			return {workflowData: [this.helpers.returnJsonArray(data)]};
 		} else {
 			const builder = new ErrorMessageBuilder(resp, realm, 202);
 			return builder.handle();
