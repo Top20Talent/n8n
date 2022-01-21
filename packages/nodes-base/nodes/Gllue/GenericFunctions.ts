@@ -9,7 +9,7 @@ import {
 import {IDataObject} from 'n8n-workflow';
 import {Consents, PipelineResponse} from './interfaces';
 
-import {CONSENT_EMAIL_TYPE, CONSENT_FROM_EMAIL, VALID_GLLUE_SOURCES} from './constants';
+import {CONSENT_EMAIL_TYPE, CONSENT_FROM_EMAIL, INTERVIEW_PIPELINE_NAME, VALID_GLLUE_SOURCES} from './constants';
 
 interface NoWebhookResponse {
 	noWebhookResponse: boolean;
@@ -249,11 +249,13 @@ export class ConsentService {
 export class SendEmailOnConsentService {
 	hasConsented: Consents;
 	hasSent: Consents;
+	pipelineName: string;
 	hasRequired: string | null;
 
-	constructor(hasConsented: Consents, hasSent: Consents, hasRequired: string | null) {
+	constructor(hasConsented: Consents, hasSent: Consents, pipelineName: string, hasRequired: string | null) {
 		this.hasConsented = hasConsented;
 		this.hasSent = hasSent;
+		this.pipelineName = pipelineName;
 		this.hasRequired = hasRequired;
 	}
 
@@ -261,7 +263,8 @@ export class SendEmailOnConsentService {
 		const hasConsented = this.hasConsented.consents.length > 0;
 		const hasSent = this.hasSent.consents.length > 0;
 		const hasRequired = this.hasRequired === 'yes';
-		return !hasConsented && !hasSent && hasRequired;
+		const isInterview = this.pipelineName === INTERVIEW_PIPELINE_NAME;
+		return !hasConsented && !hasSent && (isInterview || hasRequired);
 	}
 }
 

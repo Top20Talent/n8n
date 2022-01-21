@@ -26,3 +26,6 @@ export const HOST_MAPPING:HostMapping = {
 	staging: 'https://flash.local.ap.ngrok.io',
 	production: ' https://replace.me.cn',
 };
+
+export const INTERVIEW_PIPELINE_NAME = 'clientinterview';
+
