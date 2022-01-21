@@ -6,7 +6,12 @@ import {
 	Gllue,
 	SendEmailOnConsentService,
 } from './GenericFunctions';
-import {CONSENT_EMAIL_TYPE, CONSENT_FROM_EMAIL, EMAIL_CHANNEL} from './constants';
+import {
+	CONSENT_EMAIL_CATEGORY,
+	CONSENT_FROM_EMAIL,
+	CONSENT_FROM_NAME,
+	EMAIL_CHANNEL
+} from './constants';
 import {buildConsentUrl} from './helpers';
 
 const helpers = require('./helpers');
@@ -64,11 +69,11 @@ export class GllueConsentLogic implements INodeType {
 
 		const service = new SendEmailOnConsentService(consented, sent, candidateData.cvsentField);
 
-		const responseData = service.canSendEmail() ? [candidateData] : [];
-		console.log('DEBUG: response=', responseData);
+
 		const envVar = process.env.NODE_ENV;
 		console.log('DEBUG: env var=', envVar);
 
+		let emailData = {};
 		if (service.canSendEmail()) {
 			const saved = await consentService.create(candidateData.id, source, EMAIL_CHANNEL);
 			console.log('DEBUG: saved consent', JSON.stringify(saved));
@@ -82,7 +87,18 @@ export class GllueConsentLogic implements INodeType {
 
 			const consentConfirmUrl = buildConsentUrl(saved.id as string);
 			console.log('DEBUG: consent confirm url=', consentConfirmUrl);
+
+			emailData = {
+				senderEmail: CONSENT_FROM_EMAIL,
+				senderName: CONSENT_FROM_NAME,
+				recipientEmail: candidateData.email,
+				dynamicTemplateFields: {consentLink: consentConfirmUrl},
+				category: CONSENT_EMAIL_CATEGORY,
+				trackId: track_id,
+			};
 		}
+		const responseData = service.canSendEmail() ? emailData : [];
+		console.log('DEBUG: response=', responseData);
 		return [this.helpers.returnJsonArray(responseData)];
 
 	}
