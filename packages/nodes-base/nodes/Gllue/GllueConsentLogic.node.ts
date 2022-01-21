@@ -67,7 +67,7 @@ export class GllueConsentLogic implements INodeType {
 		const sent = await consentService.getSentIn30Days(candidateData.id, source, EMAIL_CHANNEL);
 		console.log('DEBUG: consent sent in 30 days=', sent);
 
-		const service = new SendEmailOnConsentService(consented, sent, candidateData.cvsentField);
+		const service = new SendEmailOnConsentService(consented, sent, resource, candidateData.cvsentField);
 
 
 		const envVar = process.env.NODE_ENV;
