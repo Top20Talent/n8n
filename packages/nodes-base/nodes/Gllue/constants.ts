@@ -13,7 +13,7 @@ export const VALID_GLLUE_SOURCES = [BLUE_GLLUE_SOURCE];
 export const CONSENT_FROM_EMAIL = 'no-reply@cgpo2o.com';
 export const CONSENT_FROM_NAME = 'No Reply';
 export const CONSENT_EMAIL_TYPE = 'CandidateConsentRequestEmail';
-export const CONSENT_EMAIL_CATEGORY = 'candidate,consent,n8n';
+export const CONSENT_EMAIL_CATEGORY = 'candidate,consent,n8n,tracking';
 
 export const DEV_NODE_ENV = 'dev';
 export const STAGING_NODE_ENV = 'staging';
