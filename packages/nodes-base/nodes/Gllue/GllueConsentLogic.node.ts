@@ -7,6 +7,7 @@ import {
 	SendEmailOnConsentService,
 } from './GenericFunctions';
 import {CONSENT_EMAIL_TYPE, CONSENT_FROM_EMAIL, EMAIL_CHANNEL} from './constants';
+import {buildConsentUrl} from './helpers';
 
 const helpers = require('./helpers');
 
@@ -78,6 +79,9 @@ export class GllueConsentLogic implements INodeType {
 
 			const updated = await consentService.updateTrackId(saved.id as string, track_id);
 			console.log('DEBUG: updated=', updated);
+
+			const consentConfirmUrl = buildConsentUrl(saved.id as string);
+			console.log('DEBUG: consent confirm url=', consentConfirmUrl);
 		}
 		return [this.helpers.returnJsonArray(responseData)];
 

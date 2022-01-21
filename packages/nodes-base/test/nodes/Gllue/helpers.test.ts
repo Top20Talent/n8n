@@ -143,20 +143,27 @@ describe('build consent url', () => {
 		process.env = OLD_ENV; // Restore old environment
 	});
 
+	const CONSENT_ID = 'fake-consent-id';
 
 	it('should build url', () => {
 		// Set the variables
 		process.env.NODE_ENV = DEV_NODE_ENV;
 
-		const consentId = 'fake-consent-id';
-		const url = buildConsentUrl(consentId);
-		expect(url).toEqual(`${HOST_MAPPING.dev}/webhook-test/consent/confirm?id=${consentId}`);
+		const url = buildConsentUrl(CONSENT_ID);
+		expect(url).toEqual(
+			`${HOST_MAPPING.dev}/webhook-test/consent/confirm?id=${CONSENT_ID}`);
 	});
 	it('should build staging url', () => {
 		process.env.NODE_ENV = STAGING_NODE_ENV;
 
-		const consentId = 'fake-consent-id';
-		const url = buildConsentUrl(consentId);
-		expect(url).toEqual(`${HOST_MAPPING.staging}/webhook/consent/confirm?id=${consentId}`);
+		const url = buildConsentUrl(CONSENT_ID);
+		expect(url).toEqual(
+			`${HOST_MAPPING.staging}/webhook/consent/confirm?id=${CONSENT_ID}`);
+	});
+	it('should raise on wrong stage', () => {
+		process.env.NODE_ENV = 'local';
+
+		expect(buildConsentUrl).toThrowError(
+			new Error('Wrong stage name "local", you should provide any of [dev,staging,production]'));
 	});
 });
