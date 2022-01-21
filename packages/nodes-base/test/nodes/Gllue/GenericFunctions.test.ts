@@ -78,6 +78,14 @@ const SIMPLE_RESPONSE = {
 		candidate: [{id: 1234, email: 'fake@email.com'}],
 	},
 };
+
+const INTERVIEW_RESPONSE = {
+		ids: [1234],
+	result: {
+		clientinterview: [{id: 31230}],
+		candidate: [{id: 1234, email: 'fake@email.com'}],
+	},
+};
 describe('gllue api', () => {
 	it('should parse id', () => {
 		const out = Gllue.extractIdAndEmail(SIMPLE_RESPONSE);
@@ -90,6 +98,10 @@ describe('gllue api', () => {
 	it('should parse sent term on cv sent', () => {
 		const out = Gllue.extractIdAndEmail(SIMPLE_RESPONSE);
 		expect(out.cvsentField).toEqual('yes');
+	});
+	it('should parse with interview', ()=>{
+		const out = Gllue.extractIdAndEmail(INTERVIEW_RESPONSE);
+		expect(out.email).toEqual('fake@email.com');
 	});
 });
 

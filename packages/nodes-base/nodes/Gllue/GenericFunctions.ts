@@ -7,7 +7,7 @@ import {
 	UrlParams,
 } from './helpers';
 import {IDataObject} from 'n8n-workflow';
-import {Consents, CvSentResponse} from './interfaces';
+import {Consents, PipelineResponse} from './interfaces';
 
 import {CONSENT_EMAIL_TYPE, CONSENT_FROM_EMAIL, VALID_GLLUE_SOURCES} from './constants';
 
@@ -130,8 +130,10 @@ export class Gllue {
 		return await getResponseByUri(uriGenerated, this.request);
 	}
 
-	static extractIdAndEmail(data: CvSentResponse) {
-		const firstCvSent = data.result.cvsent[0];
+	static extractIdAndEmail(data: PipelineResponse) {
+		const hasCvSent = data.result.hasOwnProperty('cvsent');
+		// @ts-ignore
+		const firstCvSent = hasCvSent ? data.result.cvsent[0] : {gllueext_send_terms_cv_sent: null};
 		const firstCandidate = data.result.candidate[0];
 		return {
 			id: firstCandidate.id,

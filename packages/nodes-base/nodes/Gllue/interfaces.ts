@@ -14,10 +14,15 @@ export interface CvSentDetailResponse {
 	gllueext_send_terms_cv_sent: string;
 }
 
-export interface CvSentResponse {
+export interface InterviewDetailResponse {
+	id: number;
+}
+
+export interface PipelineResponse {
 	ids: number[];
 	result: {
-		cvsent: CvSentDetailResponse[];
+		clientinterview?: InterviewDetailResponse[];
+		cvsent?: CvSentDetailResponse[];
 		candidate: CandidateResponse[]
 	};
 }
