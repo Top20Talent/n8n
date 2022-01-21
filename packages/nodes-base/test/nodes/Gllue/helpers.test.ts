@@ -1,6 +1,6 @@
-import {convertEventPayload, getCurrentTimeStamp, UrlParams} from '../../../nodes/Gllue/helpers';
+import {buildConsentUrl, convertEventPayload, UrlParams} from '../../../nodes/Gllue/helpers';
 import {GllueEvent} from '../../../nodes/Gllue/interfaces';
-import {BLUE_HOST} from '../../../nodes/Gllue/constants';
+import {BLUE_HOST, DEV_NODE_ENV, HOST_MAPPING, STAGING_NODE_ENV} from '../../../nodes/Gllue/constants';
 
 
 const helpers = require('../../../nodes/Gllue/helpers');
@@ -99,7 +99,7 @@ describe('Gllue url parameters builder', () => {
 		expect(url).toEqual(
 			`${BASE_URL}?gql=&${DEFAULT_PARAMS}`);
 	});
-		it('should build with blue token', () => {
+	it('should build with blue token', () => {
 		const urlParams = new UrlParams('', 'id', TOKEN);
 		const url = helpers.gllueUrlBuilder(BLUE_HOST, RESOURCE, OPTION, urlParams);
 		expect(url).toEqual(
@@ -128,5 +128,35 @@ describe('gllue event convert', () => {
 			'sign': '407ee388772e372d3a118af4037c1453',
 		});
 
+	});
+});
+
+describe('build consent url', () => {
+	const OLD_ENV = process.env;
+
+	beforeEach(() => {
+		jest.resetModules(); // Most important - it clears the cache
+		process.env = {...OLD_ENV}; // Make a copy
+	});
+
+	afterAll(() => {
+		process.env = OLD_ENV; // Restore old environment
+	});
+
+
+	it('should build url', () => {
+		// Set the variables
+		process.env.NODE_ENV = DEV_NODE_ENV;
+
+		const consentId = 'fake-consent-id';
+		const url = buildConsentUrl(consentId);
+		expect(url).toEqual(`${HOST_MAPPING.dev}/webhook-test/consent/confirm?id=${consentId}`);
+	});
+	it('should build staging url', () => {
+		process.env.NODE_ENV = STAGING_NODE_ENV;
+
+		const consentId = 'fake-consent-id';
+		const url = buildConsentUrl(consentId);
+		expect(url).toEqual(`${HOST_MAPPING.staging}/webhook/consent/confirm?id=${consentId}`);
 	});
 });

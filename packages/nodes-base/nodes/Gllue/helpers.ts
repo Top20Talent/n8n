@@ -1,7 +1,7 @@
 import {OptionsWithUri} from 'request';
 import {IDataObject} from 'n8n-workflow';
 import {GllueEvent} from './interfaces';
-import {BLUE_HOST, BLUE_TOKEN_KEY, TOKEN_KEY} from './constants';
+import {BLUE_HOST, BLUE_TOKEN_KEY, DEV_NODE_ENV, HOST_MAPPING, TOKEN_KEY} from './constants';
 import * as moment from 'moment-timezone';
 
 const crypto = require('crypto');
@@ -127,4 +127,11 @@ export function convertEventPayload(item: GllueEvent):IDataObject{
 export function getOffSetDate(days: number):string{
 	const date = moment().add(days, 'days');
 	return date.format('YYYY-MM-DD');
+}
+
+export function buildConsentUrl( consentId: string): string{
+	const stage = process.env.NODE_ENV || DEV_NODE_ENV;
+	const host = HOST_MAPPING[stage];
+	const postfix = stage === DEV_NODE_ENV ? '-test': '';
+	return `${host}/webhook${postfix}/consent/confirm?id=${consentId}`;
 }
