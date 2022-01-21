@@ -79,7 +79,7 @@ export class GllueConsentLogic implements INodeType {
 			console.log('DEBUG: saved consent', JSON.stringify(saved));
 			const emailService = new EmailNotificationService(this.helpers.request);
 			const email = await emailService.saveConsentEmail(candidateData.email);
-			const track_id = email.insert_email_notification.returning[0].track_id;
+			const track_id = email.track_id;
 			console.log('DEBUG: track_id', track_id);
 
 			const updated = await consentService.updateTrackId(saved.id as string, track_id);
@@ -95,6 +95,9 @@ export class GllueConsentLogic implements INodeType {
 				dynamicTemplateFields: {consentLink: consentConfirmUrl},
 				category: CONSENT_EMAIL_CATEGORY,
 				trackId: track_id,
+				emailId: email.id,
+				consentId: saved.id,
+
 			};
 		}
 		const responseData = service.canSendEmail() ? emailData : [];

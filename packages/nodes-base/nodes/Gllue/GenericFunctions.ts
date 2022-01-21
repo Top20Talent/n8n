@@ -286,6 +286,7 @@ export class EmailNotificationService {
 	}
 
 	async saveConsentEmail(email: string) {
-		return await this.create(CONSENT_FROM_EMAIL, email, CONSENT_EMAIL_TYPE);
+		const response = await this.create(CONSENT_FROM_EMAIL, email, CONSENT_EMAIL_TYPE);
+		return response.insert_email_notification.returning[0];
 	}
 }
