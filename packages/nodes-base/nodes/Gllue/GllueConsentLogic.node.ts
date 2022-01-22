@@ -2,17 +2,15 @@ import {IExecuteFunctions,} from 'n8n-core';
 
 import {IDataObject, INodeExecutionData, INodeType, INodeTypeDescription,} from 'n8n-workflow';
 import {
-	ConsentService, EmailNotificationService,
-	Gllue,
-	SendEmailOnConsentService,
-} from './GenericFunctions';
-import {
 	CONSENT_EMAIL_CATEGORY,
 	CONSENT_FROM_EMAIL,
 	CONSENT_FROM_NAME,
 	EMAIL_CHANNEL
 } from './constants';
 import {buildConsentUrl} from './helpers';
+import {ConsentService} from './services/consent';
+import {EmailNotificationService, SendEmailOnConsentService} from './services/email';
+import {Gllue} from './services/gllue';
 
 const helpers = require('./helpers');
 

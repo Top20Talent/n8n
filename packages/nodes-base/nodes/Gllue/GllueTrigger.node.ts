@@ -2,12 +2,7 @@ import {IWebhookFunctions} from 'n8n-core';
 
 import {IDataObject, INodeType, INodeTypeDescription, IWebhookResponseData} from 'n8n-workflow';
 import {convertEventPayload} from './helpers';
-import {
-	ErrorMessageBuilder,
-	EventChecker,
-	SourceValidator,
-	TokenValidator,
-} from './GenericFunctions';
+import {ErrorMessageBuilder, EventChecker, SourceValidator, TokenValidator} from './validators';
 
 export class GllueTrigger implements INodeType {
 	description: INodeTypeDescription = {

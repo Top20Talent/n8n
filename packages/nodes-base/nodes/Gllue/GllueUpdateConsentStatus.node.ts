@@ -1,11 +1,10 @@
 import {IExecuteFunctions,} from 'n8n-core';
 
 import {IDataObject, INodeExecutionData, INodeType, INodeTypeDescription, NodeOperationError,} from 'n8n-workflow';
-import { shouldUpdateConsentStatus } from './GenericFunctions';
 import { generateTokenWithAESKey, getCurrentTimeStamp } from './helpers';
-import { GllueCandidateService } from './services';
 
-const services = require('./services');
+import {shouldUpdateConsentStatus} from './services/consent';
+import {GllueCandidateService} from './services/gllue';
 
 
 export class GllueUpdateConsentStatus implements INodeType {
@@ -59,7 +58,7 @@ export class GllueUpdateConsentStatus implements INodeType {
 		const candidateService = new GllueCandidateService(credentials.apiHost as string, token, this.helpers.request);
 
 		const candidateData = await candidateService.getCandidateById(candidateId, 'id,name,englishName,gllueext_consent_status');
-		if (candidateData == undefined){
+		if (candidateData === undefined){
 			throw new NodeOperationError(this.getNode(), `No candidate found [ID=${candidateId}]`);
 		}
 		if (shouldUpdateConsentStatus(candidateData.gllueext_consent_status as string, status)){
