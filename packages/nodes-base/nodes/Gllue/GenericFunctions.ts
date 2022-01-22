@@ -295,3 +295,42 @@ export class EmailNotificationService {
 		return response.insert_email_notification.returning[0];
 	}
 }
+
+import {CONSENT_STATUS_CONSENTED, CONSENT_STATUS_SENT } from './constants';
+
+
+export function shouldUpdateConsentStatus(currentStatus: string|undefined, newStatus: string): boolean {
+	const newStatusIsNotNull = newStatus !== undefined && newStatus !== '';
+
+	return newStatusIsNotNull && newStatus !== currentStatus && currentStatus !== CONSENT_STATUS_CONSENTED;
+}
+
+
+export class GllueCandidateListEndpoint extends Gllue {
+	resource = 'candidate';
+
+	async get(resourceId: number, fields?: string) {
+		let response = await this.getDetail(this.resource, resourceId, fields);
+		if (response !== undefined && Object.keys(response).includes('result') && response.result.candidate !== undefined){
+			response = response.result.candidate;
+		}
+		return response;
+	}
+
+}
+
+export class GllueCandidateCreateEndpoint extends Gllue {
+	resource = 'candidate';
+	operation = 'add';
+
+	async post(payload: IDataObject){
+		const urlParams = new UrlParams('', '', this.token);
+		const urlGenerated = gllueUrlBuilder(this.apiHost, this.resource, this.operation, urlParams);
+
+		const options = buildOptionWithUri(urlGenerated, 'POST', payload);
+		return await this.request(options);
+	}
+}
+
+
+

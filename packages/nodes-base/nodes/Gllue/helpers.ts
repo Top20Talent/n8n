@@ -129,13 +129,18 @@ export function getOffSetDate(days: number):string{
 	return date.format('YYYY-MM-DD');
 }
 
-export function buildConsentUrl( consentId: string): string{
+export function buildConsentUrl( consentId: string): string {
 	const stage = process.env.NODE_ENV || DEV_NODE_ENV;
 	const validStageNames = Object.keys(HOST_MAPPING);
-	if(!validStageNames.includes(stage)){
+	if (!validStageNames.includes(stage)) {
 		throw new Error(`Wrong stage name "${stage}", you should provide any of [${validStageNames}]`);
 	}
 	const host = HOST_MAPPING[stage];
-	const postfix = stage === DEV_NODE_ENV ? '-test': '';
+	const postfix = stage === DEV_NODE_ENV ? '-test' : '';
 	return `${host}/webhook${postfix}/consent/confirm?id=${consentId}`;
+}
+
+export function prepareGllueApiUpdateData(id: number|string, updateData: IDataObject): IDataObject {
+	let result = Object.assign({}, updateData, {id:(typeof id === 'string')? parseInt(id, 10) : id});
+	return {data: JSON.stringify(result)};
 }

@@ -424,6 +424,7 @@
       "dist/nodes/Gllue/Gllue.node.js",
       "dist/nodes/Gllue/GllueTrigger.node.js",
       "dist/nodes/Gllue/GllueConsentLogic.node.js",
+      "dist/nodes/Gllue/GllueUpdateConsentStatus.node.js",
       "dist/nodes/Google/Analytics/GoogleAnalytics.node.js",
       "dist/nodes/Google/BigQuery/GoogleBigQuery.node.js",
       "dist/nodes/Google/Books/GoogleBooks.node.js",

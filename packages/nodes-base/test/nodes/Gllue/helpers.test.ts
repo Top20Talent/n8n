@@ -167,3 +167,16 @@ describe('build consent url', () => {
 			new Error('Wrong stage name "local", you should provide any of [dev,staging,production]'));
 	});
 });
+
+describe('prepareGllueApiUpdateData', () => {
+	it('should build proper gllue update payload', () => {
+		const data = helpers.prepareGllueApiUpdateData(123, {name: 'Name'});
+		expect(Object.keys(data)).toEqual(['data']);
+		expect(data).toEqual({data:'{"name":"Name","id":123}'});
+	});
+	it('should replace id in update date with id privided separately', () => {
+		const data = helpers.prepareGllueApiUpdateData(123, {name: 'Name', id:456});
+		expect(Object.keys(data)).toEqual(['data']);
+		expect(data).toEqual({data:'{"name":"Name","id":123}'});
+	});
+});

@@ -1,5 +1,6 @@
 export const DEFAULT_PAGINATE_BY = 25;
 export const DEFAULT_PAGE = 1;
+
 export const CV_SENT_EVENT = 'cvsent';
 export const INTERVIEW_EVENT = 'clientinterview';
 export const BLUE_HOST = 'https://cgpbrands.cgptalent.cn';
@@ -28,4 +29,8 @@ export const HOST_MAPPING:HostMapping = {
 };
 
 export const INTERVIEW_PIPELINE_NAME = 'clientinterview';
+
+
+export const CONSENT_STATUS_CONSENTED = 'consented';
+export const CONSENT_STATUS_SENT = 'sent';
 
