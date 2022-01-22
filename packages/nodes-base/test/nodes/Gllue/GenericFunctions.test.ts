@@ -4,9 +4,9 @@ import {
 
 } from '../../../nodes/Gllue/GenericFunctions';
 import {CV_SENT_EVENT, INTERVIEW_EVENT} from '../../../nodes/Gllue/constants';
-import {ErrorMessageBuilder, EventChecker, SourceValidator, TokenValidator} from "../../../nodes/Gllue/validators";
-import {SendEmailOnConsentService} from "../../../nodes/Gllue/services/email";
-import {Gllue} from "../../../nodes/Gllue/services/gllue";
+import {ErrorMessageBuilder, EventChecker, SourceValidator, TokenValidator} from '../../../nodes/Gllue/validators';
+import {SendEmailOnConsentService} from '../../../nodes/Gllue/services/email';
+import {Gllue} from '../../../nodes/Gllue/services/gllue';
 
 
 describe('error message builder', () => {
