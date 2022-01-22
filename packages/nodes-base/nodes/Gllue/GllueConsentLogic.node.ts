@@ -77,6 +77,7 @@ export class GllueConsentLogic implements INodeType {
 				trackId: track_id,
 				emailId: email.id,
 				consentId: saved.id,
+				externalId: candidateData.id,
 
 			};
 		}
