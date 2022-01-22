@@ -3,7 +3,6 @@ import {IExecuteFunctions,} from 'n8n-core';
 import {IDataObject, INodeExecutionData, INodeType, INodeTypeDescription, NodeOperationError,} from 'n8n-workflow';
 import {generateTokenWithAESKey, getCurrentTimeStamp} from './helpers';
 
-import {shouldUpdateConsentStatus} from './services/consent';
 import {GllueCandidateService} from './services/gllue';
 
 
