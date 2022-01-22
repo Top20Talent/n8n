@@ -1,7 +1,7 @@
 import {IExecuteFunctions,} from 'n8n-core';
 
 import {IDataObject, INodeExecutionData, INodeType, INodeTypeDescription, NodeOperationError,} from 'n8n-workflow';
-import { generateTokenWithAESKey, getCurrentTimeStamp } from './helpers';
+import {generateTokenWithAESKey, getCurrentTimeStamp} from './helpers';
 
 import {shouldUpdateConsentStatus} from './services/consent';
 import {GllueCandidateService} from './services/gllue';
@@ -33,16 +33,16 @@ export class GllueUpdateConsentStatus implements INodeType {
 				name: 'candidateId',
 				type: 'string',
 				required: true,
-				default:'',
-				description:'Candidate ID',
+				default: '',
+				description: 'Candidate ID',
 			},
 			{
 				displayName: 'Consent Status',
 				name: 'consentStatus',
 				type: 'string',
 				required: true,
-				default:'',
-				description:'Consent status to set to the candidate',
+				default: '',
+				description: 'Consent status to set to the candidate',
 			},
 		],
 	};
@@ -51,20 +51,14 @@ export class GllueUpdateConsentStatus implements INodeType {
 
 		const candidateId = this.getNodeParameter('candidateId', 0) as number;
 		const status = this.getNodeParameter('consentStatus', 0) as string;
-		let responseData : IDataObject = {status: false, data: candidateId};
+		let responseData: IDataObject = {status: false, data: candidateId};
 
 		const credentials = await this.getCredentials('gllueApi') as IDataObject;
 		const token = generateTokenWithAESKey(getCurrentTimeStamp(), credentials.apiUsername as string, credentials.apiAesKey as string);
 		const candidateService = new GllueCandidateService(credentials.apiHost as string, token, this.helpers.request);
+		const updateData = {id: candidateId, gllueext_consent_status: status};
+		responseData = await candidateService.createOrUpdate(updateData);
 
-		const candidateData = await candidateService.getCandidateById(candidateId, 'id,name,englishName,gllueext_consent_status');
-		if (candidateData === undefined){
-			throw new NodeOperationError(this.getNode(), `No candidate found [ID=${candidateId}]`);
-		}
-		if (shouldUpdateConsentStatus(candidateData.gllueext_consent_status as string, status)){
-			const updateData = {id: candidateId, gllueext_consent_status: status};
-			responseData = await candidateService.createOrUpdate(updateData);
-		}
 		return [this.helpers.returnJsonArray(responseData)];
 	}
 }
