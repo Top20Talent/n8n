@@ -38,10 +38,15 @@ export class GllueUpdateConsentStatus implements INodeType {
 			{
 				displayName: 'Consent Status',
 				name: 'consentStatus',
-				type: 'string',
+				type: 'options',
 				required: true,
-				default: '',
+				default: 'sent',
 				description: 'Consent status to set to the candidate',
+				options: [
+					{name: 'Sent', value: 'sent'},
+					{name: 'Consented', value: 'consented'},
+					{name: 'Initial', value: ' '},
+				],
 			},
 		],
 	};
