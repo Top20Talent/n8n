@@ -15,7 +15,7 @@ export class GllueUpdateConsentStatus implements INodeType {
 		version: 1,
 		description: 'Update Candidate Consent Status in Gllue',
 		defaults: {
-			name: 'Gllue',
+			name: 'Gllue Update Consent Status',
 			color: '#1A82e2',
 		},
 		inputs: ['main'],
