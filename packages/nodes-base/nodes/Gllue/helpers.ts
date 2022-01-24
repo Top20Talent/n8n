@@ -141,6 +141,6 @@ export function buildConsentUrl( consentId: string): string {
 }
 
 export function prepareGllueApiUpdateData(id: number|string, updateData: IDataObject): IDataObject {
-	let result = Object.assign({}, updateData, {id:(typeof id === 'string')? parseInt(id, 10) : id});
+	const result = Object.assign({}, updateData, {id:(typeof id === 'string')? parseInt(id, 10) : id});
 	return {data: JSON.stringify(result)};
 }
