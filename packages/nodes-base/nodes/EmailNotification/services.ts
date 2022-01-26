@@ -14,16 +14,23 @@ export class GetEmailByTrackIdAPIEndpoint extends EmailAPI {
 	}
 }
 
+class UpdateEmailByIdAPIEndpoint extends EmailAPI {
+	action = 'update';
+}
+
 export class EmailNotificationService {
 	getEmailByTrackIdEndpoint: GetEmailByTrackIdAPIEndpoint;
+	updateEmailById: UpdateEmailByIdAPIEndpoint;
 
 	constructor(request: N8nRequest) {
 		this.getEmailByTrackIdEndpoint = new GetEmailByTrackIdAPIEndpoint(request);
+		this.updateEmailById = new UpdateEmailByIdAPIEndpoint(request);
 	}
 
 	async getEmailByTrackId(id: string){
 		return await this.getEmailByTrackIdEndpoint.get(id);
 	}
+
 }
 
 function buildDataByAction(action: string, datetime: number){

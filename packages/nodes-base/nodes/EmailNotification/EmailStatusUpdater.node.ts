@@ -65,7 +65,8 @@ export class EmailStatusUpdater implements INodeType {
 		const payload = buildPayloadFromEvent(email.id, body.event, body.timestamp);
 		console.log('DEBUG: url=', url);
 		console.log('DEBUG: payload=', payload);
-
+		const response = await service.updateEmailById.post(payload);
+		console.log('DEBUG: response=', response);
 		return [[]];
 	}
 }
