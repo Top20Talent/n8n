@@ -8,8 +8,8 @@ import {
 	INodeType,
 	INodeTypeDescription,
 } from 'n8n-workflow';
-import {buildPayloadFromEvent, buildUrlFromId, EmailNotificationService} from './services';
-
+import {EmailNotificationService} from './services';
+import {SendGridEventBody} from './interfaces';
 
 
 export class EmailStatusUpdater implements INodeType {
@@ -27,24 +27,17 @@ export class EmailStatusUpdater implements INodeType {
 		inputs: ['main'],
 		outputs: ['main'],
 		credentials: [],
-		properties: [
-		],
+		properties: [],
 	};
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const item = this.getInputData()[0].json;
-
-		interface SendGridEventBody extends IDataObject {
-			event: string;
-			timestamp: number;
-			trackId: string;
-		}
-
 		const body = item.body as SendGridEventBody;
+
 		const service = new EmailNotificationService(this.helpers.request);
 		const email = await service.getEmailByTrackId(body.trackId);
-		const url = buildUrlFromId(email.id);
-		const payload = buildPayloadFromEvent(email.id, body.event, body.timestamp);
+		const payload = service.buildPayloadFromEvent(email.id, body.event, body.timestamp);
+
 		const response = await service.updateEmailById.post(payload);
 		return [this.helpers.returnJsonArray(response)];
 	}
