@@ -48,7 +48,6 @@ export class EmailStatusUpdater implements INodeType {
 		],
 	};
 
-
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const item = this.getInputData()[0].json;
 
@@ -63,10 +62,7 @@ export class EmailStatusUpdater implements INodeType {
 		const email = await service.getEmailByTrackId(body.trackId);
 		const url = buildUrlFromId(email.id);
 		const payload = buildPayloadFromEvent(email.id, body.event, body.timestamp);
-		console.log('DEBUG: url=', url);
-		console.log('DEBUG: payload=', payload);
 		const response = await service.updateEmailById.post(payload);
-		console.log('DEBUG: response=', response);
-		return [[]];
+		return [this.helpers.returnJsonArray(response)];
 	}
 }
