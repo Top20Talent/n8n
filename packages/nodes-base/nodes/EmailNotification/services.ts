@@ -31,10 +31,10 @@ export class EmailNotificationService {
 		return await this.getEmailByTrackIdEndpoint.get(id);
 	}
 
-	buildDataByAction(action: string, datetime: number) {
-		const timestamp = moment.unix(datetime).format();
-		return action === 'click' ? {is_clicked: true, clicked_at: timestamp} :
-			{is_opened: true, opened_at: timestamp};
+	buildDataByAction(action: string, timestamp: number) {
+		const datetime = moment.unix(timestamp).format();
+		return action === 'click' ? {is_clicked: true, clicked_at: datetime} :
+			{is_opened: true, opened_at: datetime};
 	}
 
 	buildPayloadFromEvent(id: string, event: string, datetime = 0) {
