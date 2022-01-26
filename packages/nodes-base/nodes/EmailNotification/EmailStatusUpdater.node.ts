@@ -28,23 +28,6 @@ export class EmailStatusUpdater implements INodeType {
 		outputs: ['main'],
 		credentials: [],
 		properties: [
-			{
-				displayName: 'Event',
-				name: 'event',
-				type: 'string',
-				required: true,
-				default: '',
-				description: 'Event come from webhooks',
-			},
-			{
-				displayName: 'Track ID',
-				name: 'trackId',
-				type: 'string',
-				required: true,
-				default: '',
-				description: 'Track ID come from webhooks to identify email',
-			},
-
 		],
 	};
 
