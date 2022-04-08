@@ -136,6 +136,5 @@ export class Gllue implements INodeType {
 		}
 		return [this.helpers.returnJsonArray(responseData)];
 	}
-
 }
 
