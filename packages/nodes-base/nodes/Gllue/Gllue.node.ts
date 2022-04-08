@@ -127,9 +127,11 @@ export class Gllue implements INodeType {
 				);
 				const body = {ids: contractIds, count: contractIds.length};
 				responseData = await getResponseByUri(uriGenerated, this.helpers.request, 'POST', body);
+			} else if (operation === 'simple_list_with_ids') {
+				responseData = await getResponseByUri(uriGenerated, this.helpers.request);
 			}
 		}
-		if (isResponseIssue(responseData)){
+		if (isResponseIssue(responseData)) {
 			throw new Error(`API Issue raised up with:${JSON.stringify(responseData)}`);
 		}
 		return [this.helpers.returnJsonArray(responseData)];
