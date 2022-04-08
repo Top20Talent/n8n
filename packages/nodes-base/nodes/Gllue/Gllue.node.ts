@@ -9,6 +9,7 @@ import {contractFields, contractOperations} from './ContractDescription';
 import {userFields, userOperations} from './UserDescriptions';
 import {DEFAULT_PAGE, DEFAULT_PAGINATE_BY} from './constants';
 import {functionFields, functionOperations} from './FunctionDescription';
+import {isResponseIssue} from "./GenericFunctions";
 
 const helpers = require('./helpers');
 
@@ -127,6 +128,9 @@ export class Gllue implements INodeType {
 				const body = {ids: contractIds, count: contractIds.length};
 				responseData = await getResponseByUri(uriGenerated, this.helpers.request, 'POST', body);
 			}
+		}
+		if (isResponseIssue(responseData)){
+			throw new Error(`API Issue raised up with:${JSON.stringify(responseData)}`);
 		}
 		return [this.helpers.returnJsonArray(responseData)];
 	}
