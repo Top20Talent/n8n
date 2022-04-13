@@ -9,7 +9,7 @@ import {contractFields, contractOperations} from './ContractDescription';
 import {userFields, userOperations} from './UserDescriptions';
 import {DEFAULT_PAGE, DEFAULT_PAGINATE_BY} from './constants';
 import {functionFields, functionOperations} from './FunctionDescription';
-import {isResponseIssue} from "./GenericFunctions";
+import {isResponseIssue} from './GenericFunctions';
 
 const helpers = require('./helpers');
 
@@ -126,6 +126,14 @@ export class Gllue implements INodeType {
 					(item, index) => this.getNodeParameter('id', index),
 				);
 				const body = {ids: contractIds, count: contractIds.length};
+				responseData = await getResponseByUri(uriGenerated, this.helpers.request, 'POST', body);
+			} else if (operation === 'add') {
+				const contractIds = this.getInputData().map(
+					(item, index) => this.getNodeParameter('id', index),
+				);
+				const payload = JSON.parse(this.getNodeParameter('payload', 0) as string);
+				// @ts-ignore
+				const body = {id: contractIds[0], ...payload};
 				responseData = await getResponseByUri(uriGenerated, this.helpers.request, 'POST', body);
 			} else if (operation === 'simple_list_with_ids') {
 				responseData = await getResponseByUri(uriGenerated, this.helpers.request);
