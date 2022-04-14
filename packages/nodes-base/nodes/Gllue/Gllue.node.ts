@@ -121,16 +121,13 @@ export class Gllue implements INodeType {
 				responseData = await getResponseByUri(uriGenerated, this.helpers.request);
 			}
 		} else if (resource === 'clientcontract') {
+			const contractIds = this.getInputData().map(
+				(item, index) => this.getNodeParameter('id', index),
+			);
 			if (operation === 'delete') {
-				const contractIds = this.getInputData().map(
-					(item, index) => this.getNodeParameter('id', index),
-				);
 				const body = {ids: contractIds, count: contractIds.length};
 				responseData = await getResponseByUri(uriGenerated, this.helpers.request, 'POST', body);
 			} else if (operation === 'add') {
-				const contractIds = this.getInputData().map(
-					(item, index) => this.getNodeParameter('id', index),
-				);
 				const payload = JSON.parse(this.getNodeParameter('payload', 0) as string);
 				// @ts-ignore
 				const body = {id: contractIds[0], ...payload};
