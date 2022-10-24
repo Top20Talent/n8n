@@ -39,7 +39,6 @@ pipeline {
             }
             steps {
                 container ('kubectl') {
-                    sh "mkdir -p ~/.kube"
                     sh "kubectl get nodes"
                     sh "sed -i 's/GIT_TAG/${GIT_TAG}/g' oa-deploy/charts/n8n/templates/stage/deployment.yaml"
                     sh "kubectl apply -f oa-deploy/charts/n8n/templates/stage/deployment.yaml"
@@ -58,8 +57,7 @@ pipeline {
                 }
             }
             steps {
-                container ('kubectl-ali') {
-                    sh "mkdir -p ~/.kube"
+                container ('kubectl') {
                     sh "kubectl get nodes"
                     sh "sed -i 's/GIT_TAG/${GIT_TAG}/g' oa-deploy/charts/n8n/templates/prod/deployment.yaml"
                     sh "kubectl apply -f oa-deploy/charts/n8n/templates/prod/deployment.yaml"
