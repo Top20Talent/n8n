@@ -1,16 +1,12 @@
-@Library('ttt-cd-utils') _
-
-
 pipeline {
     agent {
-        kubernetes {
-            yaml containers('docker-dind', 'kubectl-ali')
-            inheritFrom 'default'
+        node {
+            label 'jenkins-slave'
         }
     }
+
     environment {
         ALIYUN_CREDS = credentials('aliyun-acr')
-        K8S_CONFIG = credentials('oa-kube-config')
         GIT_TAG = sh(returnStdout: true,script: 'git rev-parse --short HEAD').trim()
     }
     stages {
@@ -27,16 +23,23 @@ pipeline {
                 }
             }
             steps {
-                container ('docker') {
-                    sh "docker login -u ${ALIYUN_CREDS_USR} -p ${ALIYUN_CREDS_PSW} registry.cn-shanghai.aliyuncs.com"
-                    sh "ls -l"
-                    sh "echo ${GIT_TAG}"
-                    sh "docker build -t registry.cn-shanghai.aliyuncs.com/cgp-application/oa-n8n:${GIT_TAG} -f docker/images/n8n-custom/Dockerfile ."
-                    sh "docker push registry.cn-shanghai.aliyuncs.com/cgp-application/oa-n8n:${GIT_TAG}"
-                    sh "docker rmi registry.cn-shanghai.aliyuncs.com/cgp-application/oa-n8n:${GIT_TAG}"
+                container ('kaniko') {
+                    sh """
+                    /kaniko/executor --single-snapshot --insecure --context ./ --dockerfile docker/images/n8n-custom/Dockerfile \
+                    --destination registry.cn-shanghai.aliyuncs.com/cgp-application/oa-n8n:${GIT_TAG}
+                    """
                 }
             }
-            
+            // steps {
+            //     container ('docker') {
+            //         sh "docker login -u ${ALIYUN_CREDS_USR} -p ${ALIYUN_CREDS_PSW} registry.cn-shanghai.aliyuncs.com"
+            //         sh "ls -l"
+            //         sh "echo ${GIT_TAG}"
+            //         sh "docker build -t registry.cn-shanghai.aliyuncs.com/cgp-application/oa-n8n:${GIT_TAG} -f docker/images/n8n-custom/Dockerfile ."
+            //         sh "docker push registry.cn-shanghai.aliyuncs.com/cgp-application/oa-n8n:${GIT_TAG}"
+            //         sh "docker rmi registry.cn-shanghai.aliyuncs.com/cgp-application/oa-n8n:${GIT_TAG}"
+            //     }
+            // }
         }
         stage('Staging Deployment') {
             when { 
@@ -45,9 +48,8 @@ pipeline {
                 }
             }
             steps {
-                container ('kubectl-ali') {
+                container ('kubectl') {
                     sh "mkdir -p ~/.kube"
-                    sh "cp ${K8S_CONFIG} ~/.kube/config"
                     sh "kubectl get nodes"
                     sh "sed -i 's/GIT_TAG/${GIT_TAG}/g' oa-deploy/charts/n8n/templates/stage/deployment.yaml"
                     sh "kubectl apply -f oa-deploy/charts/n8n/templates/stage/deployment.yaml"
@@ -68,7 +70,6 @@ pipeline {
             steps {
                 container ('kubectl-ali') {
                     sh "mkdir -p ~/.kube"
-                    sh "cp ${K8S_CONFIG} ~/.kube/config"
                     sh "kubectl get nodes"
                     sh "sed -i 's/GIT_TAG/${GIT_TAG}/g' oa-deploy/charts/n8n/templates/prod/deployment.yaml"
                     sh "kubectl apply -f oa-deploy/charts/n8n/templates/prod/deployment.yaml"
