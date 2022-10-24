@@ -6,7 +6,6 @@ pipeline {
     }
 
     environment {
-        ALIYUN_CREDS = credentials('aliyun-acr')
         GIT_TAG = sh(returnStdout: true,script: 'git rev-parse --short HEAD').trim()
     }
     stages {
