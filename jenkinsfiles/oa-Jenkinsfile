@@ -22,23 +22,14 @@ pipeline {
                 }
             }
             steps {
-                container ('kaniko') {
-                    sh """
-                    /kaniko/executor --single-snapshot --insecure --context ./ --dockerfile docker/images/n8n-custom/Dockerfile \
-                    --destination registry.cn-shanghai.aliyuncs.com/cgp-application/oa-n8n:${GIT_TAG}
-                    """
+                container ('docker') {
+                    sh "ls -l"
+                    sh "echo ${GIT_TAG}"
+                    sh "docker build -t registry.cn-shanghai.aliyuncs.com/cgp-application/oa-n8n:${GIT_TAG} -f docker/images/n8n-custom/Dockerfile ."
+                    sh "docker push registry.cn-shanghai.aliyuncs.com/cgp-application/oa-n8n:${GIT_TAG}"
+                    sh "docker rmi registry.cn-shanghai.aliyuncs.com/cgp-application/oa-n8n:${GIT_TAG}"
                 }
             }
-            // steps {
-            //     container ('docker') {
-            //         sh "docker login -u ${ALIYUN_CREDS_USR} -p ${ALIYUN_CREDS_PSW} registry.cn-shanghai.aliyuncs.com"
-            //         sh "ls -l"
-            //         sh "echo ${GIT_TAG}"
-            //         sh "docker build -t registry.cn-shanghai.aliyuncs.com/cgp-application/oa-n8n:${GIT_TAG} -f docker/images/n8n-custom/Dockerfile ."
-            //         sh "docker push registry.cn-shanghai.aliyuncs.com/cgp-application/oa-n8n:${GIT_TAG}"
-            //         sh "docker rmi registry.cn-shanghai.aliyuncs.com/cgp-application/oa-n8n:${GIT_TAG}"
-            //     }
-            // }
         }
         stage('Staging Deployment') {
             when { 
