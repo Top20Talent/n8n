@@ -23,15 +23,6 @@ export interface ClientResponse {
 	warning_situation: string;
 }
 
-interface Contract {
-	id:number;
-	is_handsoff:boolean;
-}
-
-export interface Contracts {
-	contracts: Contract[];
-}
-
 export interface ClientContractResponse{
 	id:number;
 	is_handsoff:boolean;

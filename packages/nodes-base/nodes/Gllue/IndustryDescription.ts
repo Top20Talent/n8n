@@ -52,7 +52,7 @@ export const industryFields: INodeProperties[] = [
 				name: 'query',
 				type: 'string',
 				default: 'id__s=2462,2455',
-				description: 'The query field accepts with gql syntax，id__eq=2472',
+				description: 'The query field accepts with gql syntax,id__eq=2472',
 			},
 			{
 				displayName: 'Fields',

@@ -12,8 +12,8 @@ export class HandsOffService {
 	}
 
 	isHandsoff() {
-		let warningSituation = this.getWarningSituation()
-		let handsOff = this.getHandsoff()
+		let warningSituation = this.getWarningSituation();
+		let handsOff = this.getHandsoff();
 		return ((warningSituation !==null) || handsOff) ? true : false;
 	}
 
