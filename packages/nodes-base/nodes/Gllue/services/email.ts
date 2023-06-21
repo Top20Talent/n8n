@@ -58,7 +58,7 @@ export class SendEmailOnConsentService {
 		const hasSent = this.hasSent.consents.length > 0;
 		const hasRequired = this.hasRequired === 'yes';
 		const isInterview = this.pipelineName === INTERVIEW_PIPELINE_NAME;
-		return !hasConsented && !hasSent && (isInterview || hasRequired);
+		return !hasConsented && !hasSent && (isInterview || hasRequired) && !this.isHandsOff;
 	}
 }
 
