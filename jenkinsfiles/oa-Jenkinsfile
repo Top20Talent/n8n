@@ -23,13 +23,11 @@ pipeline {
                 }
             }
             steps {
-                container ('jenkins-slave') {
-                    sh "ls -l"
-                    sh "echo ${GIT_TAG}"
-                    sh "docker build -t registry.cn-shanghai.aliyuncs.com/cgp-application/oa-n8n:${GIT_TAG} -f docker/images/n8n-custom/Dockerfile ."
-                    sh "docker push registry.cn-shanghai.aliyuncs.com/cgp-application/oa-n8n:${GIT_TAG}"
-                    sh "docker rmi registry.cn-shanghai.aliyuncs.com/cgp-application/oa-n8n:${GIT_TAG}"
-                }
+							sh "ls -l"
+							sh "echo ${GIT_TAG}"
+							sh "docker build -t registry.cn-shanghai.aliyuncs.com/cgp-application/oa-n8n:${GIT_TAG} -f docker/images/n8n-custom/Dockerfile ."
+							sh "docker push registry.cn-shanghai.aliyuncs.com/cgp-application/oa-n8n:${GIT_TAG}"
+							sh "docker rmi registry.cn-shanghai.aliyuncs.com/cgp-application/oa-n8n:${GIT_TAG}"
             }
         }
         stage('Staging Deployment') {
