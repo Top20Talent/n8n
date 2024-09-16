@@ -18,12 +18,24 @@ export interface InterviewDetailResponse {
 	id: number;
 }
 
+export interface ClientResponse {
+	id:number;
+	warning_situation: string;
+}
+
+export interface ClientContractResponse{
+	id:number;
+	is_handsoff:boolean;
+}
+
 export interface PipelineResponse {
 	ids: number[];
 	result: {
 		clientinterview?: InterviewDetailResponse[];
 		cvsent?: CvSentDetailResponse[];
-		candidate: CandidateResponse[]
+		candidate: CandidateResponse[];
+		client: ClientResponse[];
+		clientcontract:ClientContractResponse[];
 	};
 }
 
